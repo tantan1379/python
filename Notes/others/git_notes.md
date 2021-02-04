@@ -41,11 +41,7 @@ git包括三个区域：工作区、暂存区、本地仓库，在远端（remot
 
 回退到某一版本(commit)：`git reset HEAD`
 
-
-
-
-
-##### 3、分支控制
+##### 4、分支控制
 
 查看分支：`git branch`
 
@@ -57,7 +53,15 @@ git包括三个区域：工作区、暂存区、本地仓库，在远端（remot
 
 创建并切换分支：`git checkout -b mybranch`
 
-##### 5、其他
+##### 5、服务器端相关
+
+显示已有服务器：`git remote`
+
+显示服务器端的地址：`git remote -v`
+
+添加服务器：`git add remote [name] ssh-address`
+
+##### 6、其他
 
 精简显示文件状态：`git status -s`  tips:A表示新添加到暂存区的文件，M表示已修改，??表示未跟踪，靠左侧表示暂存区，靠右侧表示工作区
 
