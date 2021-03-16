@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# file: resnet18.py
+# file: Resnet.py
 # author: twh
 # time: 2021/3/11 19:38
 import torch.nn as nn

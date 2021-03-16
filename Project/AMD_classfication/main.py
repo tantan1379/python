@@ -4,7 +4,6 @@
 # author: twh
 # time: 2021/3/11 19:37
 from torch.utils.data import DataLoader
-from torch import optim
 import matplotlib.pyplot as plt
 import warnings
 import numpy as np
@@ -12,16 +11,9 @@ import argparse
 from tqdm import tqdm
 import time
 from dataset import *
-from resnet18 import *
-
+from Resnet import *
 
 warnings.filterwarnings("ignore")
-
-
-def choose_lr(speed):
-    # Select optimizer
-    optimizer = optim.Adam(model.parameters(), lr=lr[speed])
-    return optimizer
 
 
 def evaluate(md, loader):
@@ -35,7 +27,7 @@ def evaluate(md, loader):
     return 100 * correct_num / total_num
 
 
-def train(md, epochs_num, tl, spd):
+def train(md, epochs_num, tl, lr):
     model.train()
     print("\nStart training:\n")
     bs_epoch, bs_acc = 0, 0
@@ -44,14 +36,14 @@ def train(md, epochs_num, tl, spd):
     ac_list = []
     for epoch in range(epochs_num):
         time.sleep(0.1)
-        txt = 'lr={}  Epoch {}'.format(lr[spd], epoch + 1)
+        txt = 'Epoch {}'.format(epoch + 1)
         for img, label in tqdm(tl, desc=txt, ncols=100, mininterval=0.01):
             # img.size [b,3,224,224]  label.size [b]
             img, label = img.to(device), label.to(device)
             logits = model(img)
             loss = loss_fn(logits, label)
             losses.append(loss.item())
-            optimizer = choose_lr(spd)
+            optimizer = torch.optim.Adam(md.parameters(),lr=lr)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -77,19 +69,20 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
     torch.cuda.manual_seed_all(0)
-    lr = [1e-5, 1e-4, 1e-3, 1e-2]
 
     # Create the parser object
     parser = argparse.ArgumentParser()
     # Add parser argument
     parser.add_argument('--device', default='GPU', choices=['GPU', 'CPU'])
-    parser.add_argument('--epochs', default='50')
+    parser.add_argument('--epochs', default='30')
     parser.add_argument('--batchsize', default='32')
+    parser.add_argument('--learning_rate', default='1e-4')
     parser.add_argument('--draw', default='1', choices=['0', '1'])
     args = parser.parse_args()
 
     # Load superparameter
     epochs = int(args.epochs)
+    learning_rate = float(args.learning_rate)
     batch_size = int(args.batchsize)
     draw = int(args.draw)
     # lr = float(args.lr)
@@ -99,12 +92,13 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     # Load dataset and model
-    train_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'train')  # dataset(0%~60%) as train_set
-    val_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'val')  # dataset(60%~80%) as validation_set
-    test_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'test')  # dataset(80%~100%) as test_set
+    train_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
+    val_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
+    test_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
     train_loader = DataLoader(train_db, batch_size=batch_size, shuffle=True, num_workers=18)
     val_loader = DataLoader(val_db, batch_size=batch_size, shuffle=False, num_workers=18)
     test_loader = DataLoader(test_db, batch_size=batch_size, shuffle=False, num_workers=18)
+    print("Classes & Labels are as follows:")
     model = resnet50(3).to(device)
 
     # Count the number of parameters
@@ -114,19 +108,9 @@ if __name__ == '__main__':
     loss_fn = nn.CrossEntropyLoss().to(device)
 
     # Start training
-    best_acc_0, best_epoch_0, loss_list_0, ac_list_0 = train(model, epochs, train_loader, 1)
+    best_acc, best_epoch, loss_list, ac_list = train(model, epochs, train_loader, learning_rate)
     print("Training Result:")
-    print('lr={} : best_acc: {:.6f}% best_epoch: {}'.format(lr[1], best_acc_0, best_epoch_0 + 1))
-    # best_acc_1, best_epoch_1, loss_list_1 = train(model, epochs, train_loader, 1)
-    # print("Training Result:")
-    # print('lr={} : best_acc: {:.6f}% best_epoch: {}'.format(lr[1], best_acc_1, best_epoch_1 + 1))
-    # best_acc_2, best_epoch_2, loss_list_2 = train(model, epochs, train_loader, 2)
-    # print("Training Result:")
-    # print('lr={} : best_acc: {:.6f}% best_epoch: {}'.format(lr[2], best_acc_2, best_epoch_2 + 1))
-    # best_acc_3, best_epoch_3, loss_list_3 = train(model, epochs, train_loader, 3)
-    # print("Training Result:")
-    # print('lr={} : best_acc: {:.6f}% best_epoch: {}'.format(lr[3], best_acc_3, best_epoch_3 + 1))
-    # print('Training finished!\n')
+    print('lr={} : best_acc: {:.6f}% best_epoch: {}'.format(learning_rate, best_acc, best_epoch + 1))
 
     # Start test
     print('Start Test:\n')
@@ -142,15 +126,12 @@ if __name__ == '__main__':
         plt.title('Acc vs. Epochs')
         plt.xlabel('Epochs')
         plt.ylabel('Acc')
-        plt.plot(x, ac_list_0, color='black', label='Accuracy_lr_1e-5')
+        plt.plot(x, ac_list, color='black', label='Accuracy_lr_1e-4')
 
         plt.figure()
         plt.title('Loss vs. Epochs')
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
-        plt.plot(x, loss_list_0, color='green', label='Loss_lr_1e-5')
-        # plt.plot(x, loss_list_1, color='red', label='Loss_lr_1e-4')
-        # plt.plot(x, loss_list_2, color='blue', label='Loss_lr_1e-3')
-        # plt.plot(x, loss_list_3, color='yellow', label='Loss_lr_1e-2')
+        plt.plot(x, loss_list, color='green', label='Loss_lr_1e-4')
         plt.legend()
         plt.show()

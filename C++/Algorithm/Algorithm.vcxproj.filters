@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="basic1.cpp">
+    <ClCompile Include="hailstone.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

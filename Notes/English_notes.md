@@ -34,7 +34,7 @@ notorious (adj.)众所周知坏的
 
 ensemble (n.)总体   
 
-nontrivial (adj.)不重要的   
+nontrivial (adj.)重要的   
 
 frame (n.)帧   
 
@@ -74,7 +74,7 @@ generalization (n.)泛化性
 
 relatively (adv.)相对地
 
-
+indispensable (adj.)不可缺少的
 
 #### ophthalmology：
 
@@ -96,13 +96,17 @@ morbidity (n.)发病
 
 
 
+retinal nerve fibre layer（RNFL） 视网膜神经纤维层
+
+subretinal pigment epithelium 视网膜色素上皮层
+
 diabetic  retinopathy(DR) 糖尿病性视网膜病变（白内障） 
 
-cystoid macular edema(CME) 黄斑囊样水肿
+cystoid macular edema（CME）黄斑囊样水肿
 
-macular hole(MH) 黄斑裂孔
+macular hole（MH）黄斑裂孔
 
-serous retinal detachment(SRD) 浆液性视网膜脱离
+serous retinal detachment（SRD）浆液性视网膜脱离
 
 ground true 金标准
 
