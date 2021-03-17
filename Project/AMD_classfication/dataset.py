@@ -17,8 +17,8 @@ class AMD_CL(data.Dataset):
     def __init__(self, root, resize, mode, transform):
         super(AMD_CL, self).__init__()
         self.root = root
-        self.resize = resize
         self.transform = transform
+        self.resize = resize
         self.images, self.labels = self.load_csv('images&labels.csv')
         assert (mode == "train" or mode == "val" or mode == "test"), "invalid mode input"
         if mode == "train":
@@ -61,23 +61,20 @@ class AMD_CL(data.Dataset):
         img, label = self.images[idx], self.labels[idx]  # img : string, labels : tensor
         trans = {
             'train': transforms.Compose([
-                lambda x: Image.open(x),
+                lambda x: Image.open(x).convert("L"),
                 transforms.Resize((int(self.resize * 1.25), int(self.resize * 1.25))),
                 transforms.RandomRotation(15),
                 transforms.CenterCrop(self.resize),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+                # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ]),
             'val': transforms.Compose([
-                lambda x: Image.open(x),
+                lambda x: Image.open(x).convert("L"),
                 transforms.Resize((int(self.resize * 1.25), int(self.resize * 1.25))),
                 transforms.CenterCrop(self.resize),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+                # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
-
         }
         if self.transform:
             img = trans['train'](img)

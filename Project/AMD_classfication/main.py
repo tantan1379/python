@@ -18,17 +18,29 @@ warnings.filterwarnings("ignore")
 
 def evaluate(md, loader):
     correct_num = 0
+    TP, TN, FN, FP = 0, 0, 0, 0
     total_num = len(loader.dataset)
     for _, (data, target) in enumerate(loader):
         data, target = data.to(device), target.to(device)
         output = md(data)
         _, prediction = torch.max(output, 1)
         correct_num += torch.eq(prediction, target).cpu().sum()
-    return 100 * correct_num / total_num
+        TP += ((target == 1) & (prediction == 1)).cpu().sum()
+        TN += ((target == 0) & (prediction == 0)).cpu().sum()
+        FN += ((target == 0) & (prediction == 1)).cpu().sum()
+        FP += ((target == 1) & (prediction == 0)).cpu().sum()
+
+    p = TP / (TP + FP)
+    r = TP / (TP + FN)
+    F1 = 2 * r * p / (r + p)
+    acc1 = (TP + TN) / (TP + TN + FP + FN)
+    acc2 = 100 * correct_num / total_num
+
+    return acc1, acc2
 
 
 def train(md, epochs_num, tl, lr):
-    model.train()
+    md.train()
     print("\nStart training:\n")
     bs_epoch, bs_acc = 0, 0
     losses = []
@@ -40,10 +52,10 @@ def train(md, epochs_num, tl, lr):
         for img, label in tqdm(tl, desc=txt, ncols=100, mininterval=0.01):
             # img.size [b,3,224,224]  label.size [b]
             img, label = img.to(device), label.to(device)
-            logits = model(img)
+            logits = md(img)
             loss = loss_fn(logits, label)
             losses.append(loss.item())
-            optimizer = torch.optim.Adam(md.parameters(),lr=lr)
+            optimizer = torch.optim.Adam(model.parameters(), lr=lr)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -51,15 +63,16 @@ def train(md, epochs_num, tl, lr):
         ls_list.append(loss)
         print('Average loss in epoch {} is {}'.format(epoch + 1, loss))
         losses = []
-        val_acc = evaluate(md, val_loader)
+        val_acc,val_acc1 = evaluate(md, val_loader)
         print('The accuracy of validation set is {:.6f}%\n'.format(val_acc))
+        print('The accuracy of validation set is {:.6f}%\n'.format(val_acc1))
         ac_list.append(val_acc)
 
         # Save
         if val_acc > bs_acc:
             bs_epoch = epoch
             bs_acc = val_acc
-            torch.save(model.state_dict(), r'AMDCL_ckp.pth')
+            torch.save(md.state_dict(), r'AMDCL_ckp.pth')
 
     return bs_acc, bs_epoch, ls_list, ac_list
 
@@ -76,15 +89,14 @@ if __name__ == '__main__':
     parser.add_argument('--device', default='GPU', choices=['GPU', 'CPU'])
     parser.add_argument('--epochs', default='30')
     parser.add_argument('--batchsize', default='32')
-    parser.add_argument('--learning_rate', default='1e-4')
     parser.add_argument('--draw', default='1', choices=['0', '1'])
     args = parser.parse_args()
 
     # Load superparameter
     epochs = int(args.epochs)
-    learning_rate = float(args.learning_rate)
     batch_size = int(args.batchsize)
     draw = int(args.draw)
+    learning_rate = 1e-4
     # lr = float(args.lr)
     if args.device == 'GPU':
         device = torch.device('cuda')
@@ -92,9 +104,9 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     # Load dataset and model
-    train_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
-    val_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
-    test_db = AMD_CL(r"F:/Lab/AMD_CL/preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
+    train_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
+    val_db = AMD_CL(r"F:\Lab/AMD_CL\preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
+    test_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
     train_loader = DataLoader(train_db, batch_size=batch_size, shuffle=True, num_workers=18)
     val_loader = DataLoader(val_db, batch_size=batch_size, shuffle=False, num_workers=18)
     test_loader = DataLoader(test_db, batch_size=batch_size, shuffle=False, num_workers=18)

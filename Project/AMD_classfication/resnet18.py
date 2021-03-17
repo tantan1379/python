@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# file: Resnet.py
+# file: resnet18.py
 # author: twh
 # time: 2021/3/11 19:38
 import torch.nn as nn
@@ -86,7 +86,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.include_top = include_top
         self.in_channel = 64
-        self.conv1 = nn.Conv2d(1, self.in_channel, kernel_size=7, stride=2,
+        self.conv1 = nn.Conv2d(3, self.in_channel, kernel_size=7, stride=2,
                                padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(self.in_channel)
         self.relu = nn.ReLU(inplace=True)
