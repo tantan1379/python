@@ -140,7 +140,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="002_Add_two_number.cpp" />
-    <ClCompile Include="019_ Remove_Nth_Node_From_End_of_List.cpp" />
+    <ClCompile Include="019_ RemoveNthNodeFromEndofList.cpp" />
+    <ClCompile Include="021_MergeTwoSortedLists.cpp" />
     <ClCompile Include="LinkList_template.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

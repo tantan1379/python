@@ -24,7 +24,10 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="019_ Remove_Nth_Node_From_End_of_List.cpp">
+    <ClCompile Include="021_MergeTwoSortedLists.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="019_ RemoveNthNodeFromEndofList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

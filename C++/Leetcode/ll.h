@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 #include <iostream>
 using namespace std;
 struct ListNode {
@@ -13,7 +14,11 @@ public:
 	ListNode(int x) : val(x), next(nullptr) {}
 	ListNode() :val(0), next(nullptr) {}
 };
-ListNode* AddTwoNumbers(ListNode* l1, ListNode* l2);
-ListNode* Init_LinkList();
+ListNode* Init_LinkList(vector<int>& arr);
 void Foreach_LinkList(ListNode* header);
 void test002();
+ListNode* AddTwoNumbers(ListNode* l1, ListNode* l2);
+void test019();
+ListNode* RemoveNthNodeFromEndofList(ListNode* header, int n);
+void test021();
+ListNode* MergeTwoSortedLists(ListNode* l1, ListNode* l2);
