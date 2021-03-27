@@ -6,10 +6,8 @@
 //class AbstractCaculator {
 //public:
 //	int m_Num1;
-//	int m_Num2;
-//	virtual int getResult() {
-//		return 0;
-//	}
+//	int m_Num2;  
+//	virtual int getResult(){};
 //};
 //
 ////加法计算器类
@@ -37,7 +35,7 @@
 //};
 //
 //void test01() {
-//	AbstractCaculator* abc = new AddCaculator;
+//	AbstractCaculator* abc = new AddCaculator;//父类的指针指向子类对象
 //	abc->m_Num1 = 10;
 //	abc->m_Num2 = 10;
 //	cout << abc->m_Num1 << " + " << abc->m_Num2 << " = " << abc->getResult() << endl;

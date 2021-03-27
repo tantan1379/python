@@ -143,7 +143,7 @@
     <ClCompile Include="11_friend_1.cpp" />
     <ClCompile Include="12_friend_2.cpp" />
     <ClCompile Include="13_friend_3.cpp" />
-    <ClCompile Include="14_operator_overloading.cpp" />
+    <ClCompile Include="14_operator_overloading_1.cpp" />
     <ClCompile Include="15_plural_addition.cpp" />
     <ClCompile Include="16_operator_overloading_2.cpp" />
     <ClCompile Include="17_operator_overloading_3.cpp" />

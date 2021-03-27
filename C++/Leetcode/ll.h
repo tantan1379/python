@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <stack>
 #include <iostream>
 using namespace std;
 struct ListNode {
@@ -26,3 +27,6 @@ void test021();
 ListNode* MergeTwoSortedLists(ListNode* l1, ListNode* l2);
 void test061();
 ListNode* RotateList(ListNode* head, int k);
+void test024();
+ListNode* SwapNodesinPairs(ListNode* head);
+ListNode* SwapNodesinPairs_(ListNode* head);

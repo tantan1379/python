@@ -145,6 +145,7 @@
     <ClCompile Include="061_RotateList.cpp" />
     <ClCompile Include="LinkList_template.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="024_SwapNodesinPairs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ll.h" />
