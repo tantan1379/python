@@ -27,7 +27,7 @@ class AMD_CL(data.Dataset):
         elif mode == "val":
             self.images = self.images[int(0.6 * len(self.images)):int(0.8 * len(self.images))]
             self.labels = self.labels[int(0.6 * len(self.labels)):int(0.8 * len(self.labels))]
-        elif mode == "train":
+        elif mode == "train" :
             self.images = self.images[int(0.8 * len(self.images)):]
             self.labels = self.labels[int(0.8 * len(self.labels)):]
         else:
@@ -61,19 +61,20 @@ class AMD_CL(data.Dataset):
         img, label = self.images[idx], self.labels[idx]  # img : string, labels : tensor
         trans = {
             'train': transforms.Compose([
-                lambda x: Image.open(x).convert("L"),
+                lambda x: Image.open(x).convert("RGB"),
                 transforms.Resize((int(self.resize * 1.25), int(self.resize * 1.25))),
                 transforms.RandomRotation(15),
                 transforms.CenterCrop(self.resize),
                 transforms.ToTensor(),
-                # transforms.Normalize(mean=[0.485,], std=[0.229,])
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
             ]),
             'val': transforms.Compose([
-                lambda x: Image.open(x).convert("L"),
+                lambda x: Image.open(x).convert("RGB"),
                 transforms.Resize((int(self.resize * 1.25), int(self.resize * 1.25))),
                 transforms.CenterCrop(self.resize),
                 transforms.ToTensor(),
-                # transforms.Normalize(mean=[0.485,], std=[0.229,])
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
         }
         if self.transform:

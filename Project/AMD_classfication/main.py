@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 from tqdm import tqdm
 import time
+from torchvision import models
 from dataset import *
 from Resnet import *
 
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     # Add parser argument
     parser.add_argument('--device', default='GPU', choices=['GPU', 'CPU'])
     parser.add_argument('--epochs', default='50')
-    parser.add_argument('--batchsize', default='32')
+    parser.add_argument('--batchsize', default='28')
     parser.add_argument('--draw', default='1', choices=['0', '1'])
     args = parser.parse_args()
 
@@ -115,11 +116,21 @@ if __name__ == '__main__':
     train_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
     val_db = AMD_CL(r"F:\Lab/AMD_CL\preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
     test_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
-    train_loader = DataLoader(train_db, batch_size=batch_size, shuffle=True, num_workers=18)
-    val_loader = DataLoader(val_db, batch_size=batch_size, shuffle=False, num_workers=18)
-    test_loader = DataLoader(test_db, batch_size=batch_size, shuffle=False, num_workers=18)
+    train_loader = DataLoader(train_db, batch_size=batch_size, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_db, batch_size=batch_size, shuffle=False, num_workers=0)
+    test_loader = DataLoader(test_db, batch_size=batch_size, shuffle=False, num_workers=0)
     print("Classes & Labels are as follows:")
-    model = resnet18(3).to(device)
+    resnet50 = models.resnet50(pretrained=True)
+    fc_inputs = resnet50.fc.in_features
+    resnet50.fc = nn.Sequential(
+    nn.Linear(fc_inputs, 256),
+    nn.ReLU(),
+    nn.Dropout(0.4),
+    nn.Linear(256, 3),
+    nn.LogSoftmax(dim=1)
+    )
+    model = resnet50.to(device)
+    
 
     # Count the number of parameters
     print('parameters_number = {}'.format(sum(p.numel() for p in list(model.parameters()) if p.requires_grad)))

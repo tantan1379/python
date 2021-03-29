@@ -5,7 +5,8 @@
 //using namespace std;
 //
 //class Building {
-//	friend void goodguy(Building* building);
+//	//全局函数做友元
+//	friend void goodguy(Building& building);
 //public:
 //	string m_SittingRoom;
 //
@@ -19,15 +20,16 @@
 //
 //};
 //
-//void goodguy(Building *building) {
-//	cout << "Your friend is visiting:" << building->m_SittingRoom << endl;
-//	cout << "Your friend is visiting:" << building->m_BedRoom << endl;
+////全局函数
+//void goodguy(Building &building) {
+//	cout << "Your friend is visiting:" << building.m_SittingRoom << endl;
+//	cout << "Your friend is visiting:" << building.m_BedRoom << endl;
 //
 //}
 //
 //void test1() {
 //	Building b;
-//	goodguy(&b);
+//	goodguy(b);
 //}
 //
 //int main() {
