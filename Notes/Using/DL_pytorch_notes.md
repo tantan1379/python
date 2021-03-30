@@ -81,6 +81,10 @@
 4、Broadcast：
 先在某一维度**之前**插入维度(unsqueeze)，再在大小为1的维度上进行扩张(expand)
 
+5、topk:
+
+`torch.topk(input, k, dim=None, largest=True, sorted=True, out=None) -> (Tensor, LongTensor)`
+
 
 
 #### Merge&Split
@@ -173,3 +177,4 @@ for param_group in optimizer.param_groups:
 
 ### 8、Others
 
+在dataloader加载后的input和output张量维度为（batchsize,

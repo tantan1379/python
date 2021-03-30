@@ -6,15 +6,84 @@
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import warnings
+import os
+import json
 import numpy as np
 import argparse
 from tqdm import tqdm
 import time
 from torchvision import models
+import matplotlib.pyplot as plt
+from prettytable import PrettyTable
 from dataset import *
 from Resnet import *
 
 warnings.filterwarnings("ignore")
+
+class ConfusionMatrix(object):
+    """
+    注意，如果显示的图像不全，是matplotlib版本问题
+    本例程使用matplotlib-3.2.1(windows and ubuntu)绘制正常
+    需要额外安装prettytable库
+    """
+    def __init__(self, num_classes: int, labels: list):
+        self.matrix = np.zeros((num_classes, num_classes))
+        self.num_classes = num_classes
+        self.labels = labels
+
+    def update(self, preds, labels):
+        for p, t in zip(preds, labels):
+            self.matrix[p, t] += 1
+
+    def summary(self):
+        # calculate accuracy
+        sum_TP = 0
+        for i in range(self.num_classes):
+            sum_TP += self.matrix[i, i]
+        acc = sum_TP / np.sum(self.matrix)
+        print("the model accuracy is ", acc)
+
+        # precision, recall, specificity
+        table = PrettyTable()
+        table.field_names = ["", "Precision", "Recall", "Specificity"]
+        for i in range(self.num_classes):
+            TP = self.matrix[i, i]
+            FP = np.sum(self.matrix[i, :]) - TP
+            FN = np.sum(self.matrix[:, i]) - TP
+            TN = np.sum(self.matrix) - TP - FP - FN
+            Precision = round(TP / (TP + FP), 3) if TP + FP != 0 else 0.
+            Recall = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.
+            Specificity = round(TN / (TN + FP), 3) if TN + FP != 0 else 0.
+            table.add_row([self.labels[i], Precision, Recall, Specificity])
+        print(table)
+
+    def plot(self):
+        matrix = self.matrix
+        print(matrix)
+        plt.imshow(matrix, cmap=plt.cm.Blues)
+
+        # 设置x轴坐标label
+        plt.xticks(range(self.num_classes), self.labels, rotation=45)
+        # 设置y轴坐标label
+        plt.yticks(range(self.num_classes), self.labels)
+        # 显示colorbar
+        plt.colorbar()
+        plt.xlabel('True Labels')
+        plt.ylabel('Predicted Labels')
+        plt.title('Confusion matrix')
+
+        # 在图中标注数量/概率信息
+        thresh = matrix.max() / 2
+        for x in range(self.num_classes):
+            for y in range(self.num_classes):
+                # 注意这里的matrix[y, x]不是matrix[x, y]
+                info = int(matrix[y, x])
+                plt.text(x, y, info,
+                         verticalalignment='center',
+                         horizontalalignment='center',
+                         color="white" if info > thresh else "black")
+        plt.tight_layout()
+        plt.show()
 
 
 def evaluate(md, loader):
@@ -23,6 +92,7 @@ def evaluate(md, loader):
     predict_num = torch.zeros((1, 3))
     acc_num = torch.zeros((1, 3))
     total_num = len(loader.dataset)
+
     for _, (data, target) in enumerate(loader):
         data, target = data.to(device), target.to(device)
         output = md(data)
@@ -33,19 +103,12 @@ def evaluate(md, loader):
         target_num += tar_mask.sum(0)
         acc_mask = pre_mask * tar_mask
         acc_num += acc_mask.sum(0)
-    recall = acc_num / target_num
-    precision = acc_num / predict_num
-    F1 = 2 * recall * precision / (recall + precision)
-    accuracy = acc_num.sum(1) / target_num.sum(1)
 
-    recall = (recall.numpy()[0] * 100).round(3)
-    precision = (precision.numpy()[0] * 100).round(3)
-    F1 = (F1.numpy()[0] * 100).round(3)
+    accuracy = acc_num.sum(1) / target_num.sum(1)
     accuracy = (accuracy.numpy()[0] * 100).round(3)
-    print('recall', " ".join('%s' % id for id in recall))
-    print('precision', " ".join('%s' % id for id in precision))
-    print('F1', " ".join('%s' % id for id in F1))
-    print('accuracy', accuracy)
+
+
+
     return accuracy
 
 
@@ -97,7 +160,7 @@ if __name__ == '__main__':
     # Add parser argument
     parser.add_argument('--device', default='GPU', choices=['GPU', 'CPU'])
     parser.add_argument('--epochs', default='50')
-    parser.add_argument('--batchsize', default='28')
+    parser.add_argument('--batchsize', default='30')
     parser.add_argument('--draw', default='1', choices=['0', '1'])
     args = parser.parse_args()
 
@@ -113,9 +176,9 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     # Load dataset and model
-    train_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
-    val_db = AMD_CL(r"F:\Lab/AMD_CL\preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
-    test_db = AMD_CL(r"F:\Lab\AMD_CL\preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
+    train_db = AMD_CL(r"F:\\Lab\\AMD_CL\\preprocessed", 224, 'train', True)  # dataset(0%~60%) as train_set
+    val_db = AMD_CL(r"F:\\Lab\\AMD_CL\\preprocessed", 224, 'val', False)  # dataset(60%~80%) as validation_set
+    test_db = AMD_CL(r"F:\\Lab\\AMD_CL\\preprocessed", 224, 'test', False)  # dataset(80%~100%) as test_set
     train_loader = DataLoader(train_db, batch_size=batch_size, shuffle=True, num_workers=0)
     val_loader = DataLoader(val_db, batch_size=batch_size, shuffle=False, num_workers=0)
     test_loader = DataLoader(test_db, batch_size=batch_size, shuffle=False, num_workers=0)
@@ -138,7 +201,7 @@ if __name__ == '__main__':
     # Select loss function
     loss_fn = nn.CrossEntropyLoss().to(device)
 
-    # Start training
+    # # Start training
     best_acc, best_epoch, loss_list, ac_list = train(model, epochs, train_loader, learning_rate)
     print("Training Result:")
     print('lr={} : best_acc: {:.2f}% best_epoch: {}'.format(learning_rate, best_acc, best_epoch + 1))
@@ -146,9 +209,20 @@ if __name__ == '__main__':
     # Start test
     print('Start Test:\n')
     model.load_state_dict(torch.load(r'AMDCL_ckp.pth'))
+    model.to(device)
     model.eval()
-    test_acc = evaluate(model, test_loader)
-    print('The accuracy of test set is {:.6f}%'.format(test_acc))
+    labels = [1,2,3]
+    confusion = ConfusionMatrix(num_classes=3, labels=labels)
+    model.eval()
+    with torch.no_grad():
+        for val_data in test_loader:
+            val_images, val_labels = val_data
+            outputs = model(val_images.to(device))
+            outputs = torch.softmax(outputs, dim=1)
+            outputs = torch.argmax(outputs, dim=1)
+            confusion.update(outputs.to("cpu").numpy(), val_labels.to("cpu").numpy())
+    confusion.plot()
+    confusion.summary()
 
     # Draw loss function curve
     if draw == 1:
