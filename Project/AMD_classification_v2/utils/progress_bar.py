@@ -19,7 +19,7 @@ class ProgressBar(object):
         self.current_loss = current_loss  # 输入记录的当前loss
         self.current_top1 = current_top1  # 输入记录的当前top1 acc
         self.model_name = model_name  # 网络名
-        self.current_lr = current_lr
+        self.current_lr = current_lr # 记录当前的学习率
 
     def __call__(self):
         percent = self.current / float(self.total)
@@ -39,13 +39,14 @@ class ProgressBar(object):
             "current_lr":self.current_lr
         }
         message = "\033[1;32;40m%(mode)s Epoch:  %(epoch)d/%(epochs)d %(bar)s\033[0m  [Current: Loss %(current_loss)f Top1: %(current_top1)f lr: %(current_lr).2e ]  %(current)d/%(total)d \033[1;32;40m[ %(percent)3d%% ]\033[0m" % args
-        self.write_message = "%(mode)s Epoch:  %(epoch)d/%(epochs)d %(bar)s  [Current: Loss %(current_loss)f Top1: %(current_top1)f %(current_lr).2e ]  %(current)d/%(total)d [ %(percent)3d%% ]" % args
+        self.write_message = "%(mode)s Epoch:  %(epoch)d/%(epochs)d [Current: Loss %(current_loss)f Top1: %(current_top1)f lr: %(current_lr).2e ]" % args
         print("\r" + message, file=self.output, end="")
 
     def done(self):
         self.current = self.total
         self()
         print("", file=self.output)
+        # 向logs输出当前的结果
         with open("./logs/%s.txt" % self.model_name, "a") as f:
             print(self.write_message, file=f)
 

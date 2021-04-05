@@ -18,7 +18,6 @@ from timeit import default_timer as timer
 from models.model import *
 from utils import *
 from IPython import embed
-
 # 1. 设置种子和初始参数
 random.seed(config.seed)
 np.random.seed(config.seed)
@@ -31,7 +30,7 @@ torch.backends.cudnn.benchmark = True  # 加快卷积计算速度
 # 2. 验证
 def evaluate(val_loader, model, optimizer, criterion, epoch):
     # 2.1 为损失和准确率创建“标尺”（拥有计数、求和、求平均功能）
-    losses = AverageMeter()  
+    losses = AverageMeter()
     top1 = AverageMeter()
     # 2.2 创建进度条
     val_progressor = ProgressBar(mode="Val  ", epoch=epoch, total_epoch=config.epochs, model_name=config.model_name,
@@ -45,7 +44,7 @@ def evaluate(val_loader, model, optimizer, criterion, epoch):
             input = input.cuda()
             target = torch.from_numpy(np.array(target)).long().cuda()  # 范式
             output = model(input)  # 将input输入模型得到预测输出
-            
+
             loss = criterion(output, target)  # 根据预测和真实标签求损失
 
             # 2.3.2 计算准确率并实时更新进度条的显示内容
@@ -93,19 +92,20 @@ def main():
     # best_precision_save = 0
 
     # 4.4 重启程序
-    assert(config.resume == "restart" or config.resume == "best" or config.resume == "last"), print("error input")
-    if config.resume == "last":
+    assert(config.resume == "restart" or config.resume ==
+           "best" or config.resume == "last"), print("error input")
+    if config.resume == "best":
         checkpoint = torch.load(
-            config.best_models + config.model_name+os.sep + str(fold) + "/model_best.pth.tar")
+            config.best_models + config.model_name + os.sep + str(fold) + "\\model_best.pth.tar")
         start_epoch = checkpoint["epoch"]
         fold = checkpoint["fold"]
         best_precision1 = checkpoint["best_precision1"]
         model.load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
 
-    elif config.resume == "best":
+    elif config.resume == "last":
         checkpoint = torch.load(
-            config.weights + config.model_name + os.sep + str(fold) + "/_checkpoint.pth.tar")
+            config.weights + config.model_name + os.sep + str(fold) + "\\_checkpoint.pth.tar")
         start_epoch = checkpoint["epoch"]
         fold = checkpoint["fold"]
         best_precision1 = checkpoint["best_precision1"]
@@ -136,7 +136,7 @@ def main():
     val_dataloader = DataLoader(ChaojieDataset(val_data_list), batch_size=config.batch_size * 2,
                                 shuffle=True, collate_fn=collate_fn, pin_memory=False, num_workers=0)
     # test_dataloader = DataLoader(ChaojieDataset(test_files,test=True),batch_size=1,shuffle=False,pin_memory=False)
-  
+
     # 4.5.5 训练部分
     model.train()
     train_losses = AverageMeter()
@@ -144,7 +144,7 @@ def main():
     valid_loss = [np.inf, 0, 0]
     for epoch in range(start_epoch, config.epochs):
         train_progressor = ProgressBar(mode="Train", epoch=epoch, total_epoch=config.epochs,
-                                       model_name=config.model_name, total=len(train_dataloader))
+                                       model_name=config.model_name,total=len(train_dataloader))
         for iter, (input, target) in enumerate(train_dataloader):
             train_progressor.current = iter
             model.train()
@@ -152,7 +152,6 @@ def main():
             target = torch.from_numpy(np.array(target)).long().cuda()
             output = model(input)
             loss = criterion(output, target)
-
             precision1_train, _ = accuracy(
                 output, target, topk=(1, 2))
             train_losses.update(loss.item(), input.size(0))
@@ -164,20 +163,16 @@ def main():
             optimizer.zero_grad()  # 梯度归零
             loss.backward()  # 反向传播
             optimizer.step()  # 梯度更新
-            train_progressor()  # 调用__call__初始化进度条
+
+            train_progressor()  # 调用__call__，每batch更新一次进度条
         scheduler.step()  # 学习率衰减更新
-        train_progressor.done()
-        # evaluate
-        # lr = get_learning_rate(optimizer)
-        # evaluate every half epoch
+        train_progressor.done()  # 调用进度条的done函数：（1）将进度条拉满 （2）向log文件输出当前的结果
+        # 验证过程
         valid_info = evaluate(val_dataloader, model,
                               optimizer, criterion, epoch)
+        # 每次检查该epoch获取的模型是否使验证集准确率更优，如果是则保存该模型
         is_best = valid_info[1] > best_precision1
         best_precision1 = max(valid_info[1], best_precision1)
-        try:
-            _ = best_precision1.cpu().data.numpy()
-        except:
-            pass
         save_checkpoint({
             "epoch": epoch + 1,
             "model_name": config.model_name,

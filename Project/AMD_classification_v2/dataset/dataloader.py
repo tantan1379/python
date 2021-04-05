@@ -58,8 +58,10 @@ def get_files(root):
     all_images,labels = [], []
     # image_folders = list(map(lambda x: root + x, os.listdir(root)))
     for f in os.listdir(root):
-        # all_images += glob.glob(os.path.join(root,f, "*.png"))
         all_images += glob.glob(os.path.join(root,f, "*.jpg"))
+        # all_images += glob.glob(os.path.join(root,f, "*.png"))
+    while " " in all_images:
+        all_images.remove(" ")
     print("loading dataset")
     # for file in tqdm(all_images):
     for image in all_images:

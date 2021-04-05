@@ -70,6 +70,8 @@ Application program interface(API) 应用程序接口
 
 longitudinal （adj.) 纵向的
 
+intermediate (adj.) 中间的
+
 suboptimal（adj.) 未达标准的
 
 variance (n.)方差   
