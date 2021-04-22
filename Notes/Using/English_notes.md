@@ -98,6 +98,8 @@ aggregate 聚合，加和
 
 ### 2.Word
 
+spatio-temporal (adj.) 时空的
+
 monotonically (adv.) 单调地
 
 homogeneous (adj.) 均匀的，同种的
@@ -139,10 +141,6 @@ reformulate (v.)重构
 ensemble (n.)总体   
 
 nontrivial (adj.)重要的   
-
-annotate (v.)注释   
-
-subtract (v.)减去   
 
 contract (v.)收缩   
 

@@ -10,11 +10,13 @@ from PIL import Image
 # ----------------------------------------------------------------
 #TODO Tensor
 # a = torch.Tensor([3,3])
-# print(a)
 # a = torch.tensor([x for x in range(-2,4)]).reshape(2,3)
+# print(a)
 # print(torch.sigmoid(a))
-point = torch.zeros([3,3]).scatter_(1,(1,1),1)
-print(point)
+# print(a.max())
+# print(torch.max(a,dim=0))
+# print(np.argmax(a))
+# print(a.argmax())
 
 # ----------------------------------------------------------------
 #TODO 数据处理
@@ -98,4 +100,19 @@ print(point)
 # print(torch.squeeze(a))
 
 # ----------------------------------------------------------------
-#TODO dice
+#TODO zip
+# matrix = np.zeros((3, 3))
+# preds = [0,0,1,0,1,2,2,1]
+# labels = [0,1,1,1,0,2,1,2]
+
+# for p,t in zip(preds, labels):
+#     matrix[p,t]+=1
+
+# print(matrix)
+
+# ----------------------------------------------------------------
+#TODO topk
+a = torch.tensor([1,2,3,4,5,6])
+b = torch.tensor([2,2,3,4,5,6])
+# b = b.view(1,-1)
+print(torch.topk(a,3,dim=0))

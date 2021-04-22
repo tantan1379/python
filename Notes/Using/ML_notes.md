@@ -1,5 +1,17 @@
 # Machine Learning
 
+## 基本：
+
+准确率 accuracy(ACC) = (TP+TN)/(TP+TN+FP+FN)
+
+召回率（查全率、灵敏度）recall(TPR) = TP/(TP+FN)
+
+精确率（查准率）precision(PPV) = TP/(TP+FP)
+
+特异度 Specificity(TNR) = TN/(TN+FP)
+
+F1 score 是对精度和召回率的调和平均 F1 = 2(precision*recall)/(precision+recall)
+
 ## 集成学习：
 
 集成学习 (ensemble learning)通过构建并结合多个学习器来完成学习任务。先产生一组"个体学习器" (individual learner)，再用某种策略将它们结合起来。

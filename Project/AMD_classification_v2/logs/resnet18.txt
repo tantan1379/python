@@ -474,3 +474,68 @@ Train Epoch:  49/50 [Current: Loss 0.093296 Top1: 96.626923 lr: 2.50e-05 ]
 Val   Epoch:  49/50 [Current: Loss 0.186210 Top1: 94.178795 lr: 2.50e-05 ]
 Train Epoch:  50/50 [Current: Loss 0.091600 Top1: 96.691612 lr: 2.50e-05 ]
 Val   Epoch:  50/50 [Current: Loss 0.207430 Top1: 92.723495 lr: 2.50e-05 ]
+Train Epoch:  1/50 [Current: Loss 0.916682 Top1: 57.380455 lr: 1.00e-04 ]
+Train Epoch:  1/50 [Current: Loss 0.917126 Top1: 33.957035 lr: 1.00e-04 ]
+Train Epoch:  1/50 [Current: Loss 0.915134 Top1: 56.964657 lr: 1.00e-04 ]
+Val   Epoch:  1/50 [Current: Loss 0.875021 Top1: 59.043659 lr: 1.00e-04 ]
+Get Better top1 : tensor(59.0437, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  2/50 [Current: Loss 0.776676 Top1: 64.899513 lr: 1.00e-04 ]
+Val   Epoch:  2/50 [Current: Loss 0.680092 Top1: 74.220375 lr: 1.00e-04 ]
+Get Better top1 : tensor(74.2204, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  3/50 [Current: Loss 0.674344 Top1: 70.293373 lr: 1.00e-04 ]
+Val   Epoch:  3/50 [Current: Loss 0.581284 Top1: 77.546776 lr: 1.00e-04 ]
+Get Better top1 : tensor(77.5468, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  4/50 [Current: Loss 0.581596 Top1: 74.982674 lr: 1.00e-04 ]
+Val   Epoch:  4/50 [Current: Loss 0.498347 Top1: 80.041580 lr: 1.00e-04 ]
+Get Better top1 : tensor(80.0416, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  5/50 [Current: Loss 0.518358 Top1: 78.184341 lr: 1.00e-04 ]
+Val   Epoch:  5/50 [Current: Loss 0.479070 Top1: 82.744286 lr: 1.00e-04 ]
+Get Better top1 : tensor(82.7443, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  6/50 [Current: Loss 0.467935 Top1: 80.526680 lr: 1.00e-04 ]
+Val   Epoch:  6/50 [Current: Loss 0.499075 Top1: 80.665283 lr: 1.00e-04 ]
+Train Epoch:  7/50 [Current: Loss 0.430293 Top1: 82.140381 lr: 1.00e-04 ]
+Val   Epoch:  7/50 [Current: Loss 0.485888 Top1: 81.912682 lr: 1.00e-04 ]
+Train Epoch:  8/50 [Current: Loss 0.390675 Top1: 83.965698 lr: 1.00e-04 ]
+Val   Epoch:  8/50 [Current: Loss 0.369354 Top1: 86.278587 lr: 1.00e-04 ]
+Get Better top1 : tensor(86.2786, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  9/50 [Current: Loss 0.361306 Top1: 85.285286 lr: 1.00e-04 ]
+Val   Epoch:  9/50 [Current: Loss 0.610303 Top1: 80.457382 lr: 1.00e-04 ]
+Train Epoch:  10/50 [Current: Loss 0.336340 Top1: 86.354813 lr: 1.00e-04 ]
+Val   Epoch:  10/50 [Current: Loss 0.318061 Top1: 87.318085 lr: 1.00e-04 ]
+Get Better top1 : tensor(87.3181, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  11/50 [Current: Loss 0.312390 Top1: 87.399994 lr: 1.00e-04 ]
+Val   Epoch:  11/50 [Current: Loss 0.319550 Top1: 87.525986 lr: 1.00e-04 ]
+Get Better top1 : tensor(87.5260, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  12/50 [Current: Loss 0.295908 Top1: 88.143913 lr: 1.00e-04 ]
+Val   Epoch:  12/50 [Current: Loss 0.378743 Top1: 85.239082 lr: 1.00e-04 ]
+Train Epoch:  13/50 [Current: Loss 0.279500 Top1: 88.842690 lr: 1.00e-04 ]
+Val   Epoch:  13/50 [Current: Loss 0.363577 Top1: 88.357590 lr: 1.00e-04 ]
+Get Better top1 : tensor(88.3576, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  14/50 [Current: Loss 0.263076 Top1: 89.530739 lr: 1.00e-04 ]
+Val   Epoch:  14/50 [Current: Loss 0.324801 Top1: 88.773392 lr: 1.00e-04 ]
+Get Better top1 : tensor(88.7734, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  15/50 [Current: Loss 0.249395 Top1: 90.085472 lr: 1.00e-04 ]
+Val   Epoch:  15/50 [Current: Loss 0.385383 Top1: 87.733887 lr: 1.00e-04 ]
+Train Epoch:  16/50 [Current: Loss 0.240304 Top1: 90.510223 lr: 1.00e-04 ]
+Val   Epoch:  16/50 [Current: Loss 0.363429 Top1: 87.318085 lr: 1.00e-04 ]
+Train Epoch:  17/50 [Current: Loss 0.228898 Top1: 90.995064 lr: 1.00e-04 ]
+Val   Epoch:  17/50 [Current: Loss 0.342062 Top1: 88.981293 lr: 1.00e-04 ]
+Get Better top1 : tensor(88.9813, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  18/50 [Current: Loss 0.217988 Top1: 91.456841 lr: 1.00e-04 ]
+Val   Epoch:  18/50 [Current: Loss 0.348133 Top1: 88.357590 lr: 1.00e-04 ]
+Train Epoch:  19/50 [Current: Loss 0.208908 Top1: 91.829887 lr: 1.00e-04 ]
+Val   Epoch:  19/50 [Current: Loss 0.334115 Top1: 90.228691 lr: 1.00e-04 ]
+Get Better top1 : tensor(90.2287, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  20/50 [Current: Loss 0.201687 Top1: 92.127510 lr: 1.00e-04 ]
+Val   Epoch:  20/50 [Current: Loss 0.368287 Top1: 88.149689 lr: 1.00e-04 ]
+Train Epoch:  21/50 [Current: Loss 0.198011 Top1: 92.277992 lr: 1.00e-04 ]
+Val   Epoch:  21/50 [Current: Loss 0.357146 Top1: 86.486488 lr: 1.00e-04 ]
+Train Epoch:  22/50 [Current: Loss 0.190497 Top1: 92.594345 lr: 1.00e-04 ]
+Val   Epoch:  22/50 [Current: Loss 0.352264 Top1: 88.149689 lr: 1.00e-04 ]
+Train Epoch:  1/50 [Current: Loss 0.913874 Top1: 57.726955 lr: 1.00e-04 ]
+Train Epoch:  1/50 [Current: Loss 0.915460 Top1: 57.311157 lr: 1.00e-04 ]
+Val   Epoch:  1/50 [Current: Loss 0.861965 Top1: 59.459461 lr: 1.00e-04 ]
+Get Better top1 : tensor(59.4595, device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar
+Train Epoch:  1/50 [Current: Loss 0.916206 Top1: 57.311157 lr: 1.00e-04 ]
+Val   Epoch:  1/50 [Current: Loss 0.885669 Top1: 56.964657 lr: 1.00e-04 ]
+Get Better top1 : tensor([56.9647], device='cuda:0') saving weights to .\checkpoints\best_model\resnet18\0\model_best.pth.tar

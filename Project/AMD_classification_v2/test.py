@@ -27,11 +27,9 @@ def evaluate(model, loader):
     top1 = AverageMeter()
     for _, (input, target) in enumerate(loader):
         input = input.cuda()
-        print(input.size(0))
         target = torch.from_numpy(np.array(target)).long().cuda()
         output = model(input)
         precision, _ = accuracy(output, target, topk=(1, 2))
-        print(input.size(0))
         top1.update(precision[0], input.size(0))
     return top1.avg.item()
 
@@ -65,18 +63,19 @@ def main():
         "checkpoints/best_model/%s/0/model_best.pth.tar" % config.model_name)
     model.load_state_dict(best_model["state_dict"])
     precision = evaluate(model, test_dataloader)
+    print(precision)
     labels = [1, 2, 3]
     confusion = ConfusionMatrix(num_classes=len(labels), labels=labels)
     model.eval()
     with torch.no_grad():
         for val_data in test_dataloader:
             val_images, val_labels = val_data
+            # print(val_images.shape)
             outputs = model(val_images.cuda())
-            # print(outputs[0])
-            outputs = torch.softmax(outputs, dim=1)
-            # print(outputs[0])
+            # print(outputs)
+            # outputs = torch.softmax(outputs, dim=1)
+            # print(outputs.shape)
             outputs = torch.argmax(outputs, dim=1)
-            # print(outputs[0])
             confusion.update(outputs.to("cpu").numpy(),
                              val_labels.to("cpu").numpy())
     confusion.plot()

@@ -5,6 +5,21 @@ import os
 from config import config
 import re
 
+class AverageMeter(object): # 标尺类
+    """Computes and stores the average and current value"""
+
+    def __init__(self): 
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
 
 def save_checkpoint(state, is_best, fold):  # state是一个记录训练结果的字典
     filename = config.weights + config.model_name + \
@@ -21,15 +36,15 @@ def save_checkpoint(state, is_best, fold):  # state是一个记录训练结果�
         shutil.copyfile(filename, message)
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target,topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     with torch.no_grad():
         maxk = max(topk)
         batch_size = target.size(0)
         # torch.topk(input, k, dim=None, largest=True, sorted=True, out=None) 返回输入张量指定dim的k个最大值
-        _, pred = output.topk(maxk, 1, True, True)  # dim=1 横向取最大
+        _, pred = output.topk(maxk, 1, True, True)
         pred = pred.t()
-        correct = pred.eq(target.view(1, -1).expand_as(pred))
+        correct = pred.eq(target)
         res = []
         for k in topk:
             correct_k = correct[:k].contiguous(

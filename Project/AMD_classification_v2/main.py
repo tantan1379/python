@@ -47,9 +47,9 @@ def evaluate(val_loader, model, optimizer, criterion, epoch):
             loss = criterion(output, target)  # 根据预测和真实标签求损失
 
             # 2.3.2 计算准确率并实时更新进度条的显示内容
-            precision1, _ = accuracy(output, target, topk=(1, 2))
+            precision = accuracy(output, target)
             losses.update(loss.item(), input.size(0))
-            top1.update(precision1[0], input.size(0))
+            top1.update(precision[0], input.size(0))
             val_progressor.current_loss = losses.avg
             val_progressor.current_top1 = top1.avg
             val_progressor.current_lr = get_learning_rate(optimizer)
@@ -151,11 +151,7 @@ def main():
             target = torch.from_numpy(np.array(target)).long().cuda()
             output = model(img)
             loss = criterion(output, target)
-            print(loss.item())
-            # print(loss.item())
-            precision1_train = accuracy(
-                output, target, topk=(1,))
-            print(img.shape)
+            precision1_train = accuracy(output, target)
             train_losses.update(loss.item(), img.size(0))  # img.size(0) = batch
             train_top1.update(precision1_train[0], img.size(0))
             train_progressor.current_loss = train_losses.avg

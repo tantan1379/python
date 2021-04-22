@@ -14,7 +14,10 @@ class ConfusionMatrix(object):
         self.num_classes = num_classes
         self.labels = labels
 
-    def update(self, preds, labels):
+    def update(self, preds, labels): # 应该注意这里的labels和类传入的labels不一样
+        # print(preds)
+        # print(labels)
+        # print("")
         for p, t in zip(preds, labels):
             self.matrix[p, t] += 1
 
@@ -28,7 +31,7 @@ class ConfusionMatrix(object):
 
         # precision, recall, specificity
         table = PrettyTable()
-        table.field_names = ["", "Precision", "Recall", "Specificity"]
+        table.field_names = ["", "Precision", "Recall", "Specificity","F1_Score"]
         for i in range(self.num_classes):
             TP = self.matrix[i, i]
             FP = np.sum(self.matrix[i, :]) - TP
@@ -37,7 +40,8 @@ class ConfusionMatrix(object):
             Precision = round(TP / (TP + FP), 3) if TP + FP != 0 else 0.
             Recall = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.
             Specificity = round(TN / (TN + FP), 3) if TN + FP != 0 else 0.
-            table.add_row([self.labels[i], Precision, Recall, Specificity])
+            F1 = round(2*Precision*Recall/(Precision+Recall),3)
+            table.add_row([self.labels[i], Precision, Recall, Specificity,F1])
         print(table)
 
     def plot(self):

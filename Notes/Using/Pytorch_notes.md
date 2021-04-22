@@ -5,14 +5,19 @@
 * tensor比ndarray的优势在于可以使用GPU进行加速计算
 * 有多少个卷积核就有多少个feature map，一个feature map对应图像被提取的一种特征
 * output = ( input - K + 2 * P ) / S + 1 ，改变S可以改变输入的维度
-* 经过trainloader加载后，loader的维度为(batchsize,channel,height,width)
 * DoubleTensor比FloatTensor有更高的精度，适合增强学习
-* dim=0，在二维中就是压缩纵向；dim=1，压缩横向
 * 需要将model先移动到cuda后，再创建optimizer
 * 应该在optimizer更新后，再对scheduler进行更新
-* 对于tensor，.shape和.size()是相同的都输出张量的形状，.dim()则表示有多少个维度，.shape[0]和.size(0)也是一样的
 * tensor和Tensor(FloatTensor)的区别在于，tensor只能接受现有的数据，Tensor可以接受数据的维度()或数据([])
-* pytorch中，参数矩阵w一般将输出后的通道写前面，即y=x@w.t() 注意：.t()方法只适合于2d的tensor
+* 通常 a.方法和torch.方法(a)可以替换
+
+* 一些shape问题：
+  （1）经过trainloader加载后，loader的维度为(batchsize,channel,height,width)
+  （2）dim=?的意思就是删除某一维度
+  （3）对于tensor，.shape和.size()是相同的都输出张量的形状，.dim()则表示有多少个维度，.shape[0]和.size(0)也是一样的
+  （4）PIL读入的图片channel在最后，torch的channel在高宽的前面
+  （5）pytorch中，参数矩阵w一般将输出后的通道写前面，即y=x@w.t() 注意：.t()方法只适合于2d的tensor
+  （6）dataloader的迭代中，每次循环（每个batch）输入到网络的img的shape为(batchsize,channel,height,width)，label(target)的shape为(batchsize,)，经过model输出后output的shape为(batchsize,num_class)[实际上output是用数值大小描述每种类预测的概率，需要通过max等函数得到真实的预测值]
 
 ------
 
@@ -59,14 +64,13 @@
 
 * 交换维度：
   （二维）：`tensor.t()`
-  （多维）：`tensor.transpose(dim1,dim2)`  常用于图片和torch之间的维度交换（PIL读入的图片channel在最后，torch的channel在高宽的前面)
+  （多维）：`tensor.transpose(dim1,dim2)`  常用于图片和torch之间的维度交换
   （通用）：`tensor.permute(dim1,dim2,dim3,...)`
 
 **Merge&Split**
 
 * cat:`torch.cat([a,b],dim) `两个拼接的tensor必须在dim维之外的维度均相等
 
-  
 
 **Math**
 
@@ -76,15 +80,27 @@
 * 近似值：向下取整：`a.floor()` 向上取整：`a.ceil()` 取整：`a.trunc()` 取小数：`a.frac()` 四舍五入：`a.round()`
 * 裁剪：`a.clamp(min,max)` 只有一个参数表示只限定最小值
 * 求范数：`a.norm(level,dim)`
-* 统计学：`a.min()`  `a.max() ` `a.mean()`  `a.prod()`(累乘)  `a.sum()`
-* 
+* 统计学：
+  `a.min()`  `a.max() ` `a.mean()`  `a.prod()`(累乘)  `a.sum()` 如果没有dim参数，则会自动展平再计算
+* 最大值：
+  `torch.max(input,dim)` 返回有两个tensor的元组：1、第dim维最大的values   2、该最大values所在该dim的索引，两者shape一致
+  `torch.argmax(input,dim)`与上类似，只返回最大值所在的索引
+  `torch.topk(input,k,dim)`沿给定dim维度返回输入张量input中 k 个最大值(含两个tensor的元组)与torch.max类似
+* 比较：torch.eq(a,b)
 
 **Property**
 
 * 查看Tensor的大小：`tensor.size()` 或 `tensor.shape` 
 * 统计Tensor的元素个数：`Tensor.numel()` 
 
-------
+**Advanced**
+
+* `torch.where(condition,x,y)` 判断condition中是否为True，成立取x中元素，不成立取y中元素
+* `torch.gather(input,dim,index)` 收集输入的特定维度指定位置的数值
+
+---
+
+
 
 ## Numpy 
 **（以下用np表示）** 
@@ -300,7 +316,7 @@ if __name__ == "__main__":
         for val_data in test_dataloader:
             val_images, val_labels = val_data
             outputs = model(val_images.cuda())
-            outputs = torch.softmax(outputs, dim=1)
+            outputs = torch.softmax(outputs, dim=1) # outputs[batch,channel,height,width]
             outputs = torch.argmax(outputs, dim=1)
             confusion.update(outputs.to("cpu").numpy(),
                              val_labels.to("cpu").numpy())
