@@ -123,8 +123,8 @@ class LITS_preprocess:
         print('the fixed dataset total numbers of samples is :', data_num)
         random.shuffle(data_name_list)
 
-        train_rate = 0.8
-        val_rate = 0.2
+        train_rate = 0.75
+        val_rate = 0.25
 
         assert val_rate+train_rate == 1.0
         train_name_list = data_name_list[0:int(data_num*train_rate)]
@@ -142,7 +142,7 @@ class LITS_preprocess:
 
 
 if __name__ == '__main__':
-    raw_dataset_path = 'F:\\Dataset\\gliomas\\'
+    raw_dataset_path = 'F:\\Dataset\\gliomas\\batch2\\'
     fixed_dataset_path = './fixed/'
     classes = 2  # 分割肝脏则置为2（二类分割），分割肝脏和肿瘤则置为3（三类分割）
     tool = LITS_preprocess(raw_dataset_path, fixed_dataset_path, classes)

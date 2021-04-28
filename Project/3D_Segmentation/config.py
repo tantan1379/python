@@ -11,7 +11,7 @@ parser.add_argument('--cpu', action='store_true',
 parser.add_argument('--seed', type=int, default=2021, help='random seed')
 
 # data in/out and dataset
-parser.add_argument('--dataset_path',default = './fixed_data',help='fixed trainset root path')
+parser.add_argument('--dataset_path',default = './fixed',help='fixed trainset root path')
 
 parser.add_argument('--save',default='3d-unet',help='save path of trained model')
 
@@ -20,7 +20,7 @@ parser.add_argument('--test_resize_scale', type=float, default=1.0,help='resize 
 
 parser.add_argument('--crop_size', type=list, default=[32, 64, 64],help='patch size of train samples after resize')
 
-parser.add_argument('--batch_size', type=list, default=4,help='batch size of trainset')
+parser.add_argument('--batch_size', type=list, default=12,help='batch size of trainset')
 
 # train
 parser.add_argument('--epochs', type=int, default=200, metavar='N',help='number of epochs to train (default: 10)')

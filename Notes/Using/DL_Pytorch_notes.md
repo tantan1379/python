@@ -1,4 +1,4 @@
-# Python_Notes
+# Deep Learning Using pytorch
 
 ## Basic knowledge
 
@@ -32,7 +32,7 @@
 
 ## Tensor
 
-**Convert**
+#### **Convert**
 
 * cpu-gpu：`data.cuda()`
   gpu-cpu：`data.cpu()`
@@ -41,7 +41,7 @@
 
 * 将tensor转换为python对象类型：`a.item()`：对只含一个元素的tensor使用
 
-**Create tensor**
+#### **Create tensor**
 
 * 随机创建指定形状的Tensor：`torch.Tensor(sizes)` 直接写维度
 
@@ -53,11 +53,11 @@
   `torch.empty(*sizes, requires_grad=False)`
   `torch.full(*size, fill_value, requires_grad=False)`
 
-**Index&slice**
+#### **Index&slice**
 
 1、选取指定维度进行切片：`a.index_select(dim,torch.tensor)`  2、冒号    3、省略号 
 
-**Dimension**
+#### **Dimension**
 
 * 调整Tensor的形状（常用）：`tensor.view()` e.g.:`x=x.view(x.size(0),-1)`
 
@@ -74,12 +74,11 @@
   （多维）：`tensor.transpose(dim1,dim2)`  常用于图片和torch之间的维度交换
   （通用）：`tensor.permute(dim1,dim2,dim3,...)`
 
-**Merge&Split**
+#### **Merge&Split**
 
 * cat:`torch.cat([a,b],dim) `两个拼接的tensor必须在dim维之外的维度均相等
 
-
-**Math**
+#### **Math**
 
 * 元素乘：`a*b`
 * 矩阵乘：`torch.matmul(a,b) `或 `a@b`   当维度高于2时，只取最后两维进行运算
@@ -95,12 +94,12 @@
   `torch.topk(input,k,dim)`沿给定dim维度返回输入张量input中 k 个最大值(含两个tensor的元组)与torch.max类似
 * 比较：torch.eq(a,b)
 
-**Property**
+#### **Property**
 
 * 查看Tensor的大小：`tensor.size()` 或 `tensor.shape` 
 * 统计Tensor的元素个数：`Tensor.numel()` 
 
-**Advanced**
+#### **Advanced**
 
 * `torch.where(condition,x,y)` 判断condition中是否为True，成立取x中元素，不成立取y中元素
 * `torch.gather(input,dim,index)` 收集输入的特定维度指定位置的数值
@@ -172,17 +171,17 @@
 
 ---
 
-## Pandas
+## Table
 
-Pandas的基础结构可以分为两种：**数据框和序列**。
+#### **pandas**
 
-**数据框（DataFrame）**是拥有轴标签的二维链表，换言之数据框是拥有标签的行和列组成的矩阵 - 列标签位列名，行标签为索引。Pandas中的行和列是Pandas序列 - 拥有轴标签的一维链表。
+Pandas的基础结构可以分为两种：**数据框和序列**。**数据框（DataFrame）**是拥有轴标签的二维链表，换言之数据框是拥有标签的行和列组成的矩阵 - 列标签位列名，行标签为索引。Pandas中的行和列是Pandas序列 - 拥有轴标签的一维链表。
 
 * 综合：
   `iterrows()` 是在数据框中的行进行迭代的一个生成器，它返回每行的索引及一个包含行本身的对象。
   `df.values`将返回构建dataframe的数组
-* dataframe的两种**加载**方式
-  （1）以字典形式载入：`df = pd.DataFrame({"a":arr1,"b":arr2})`
+* dataframe的两种种**加载**方式
+  （1）以字典形式载入：`df = pd.DataFrame({"a":arr1,"b":arr2},index=list("01"),columns=list("ab"))`  这里的字典常用OrderedDict，这里的index和columns可以省略
   （2）将整个(二维)数组传入：`df = pd.DataFrame(data,columns=['a','b'])`注意，data的列数必须与columns匹配
 * dataframe的**切片**
   （1）整数索引切片（前闭后开，不能单条）：`df[0:1]`
@@ -202,6 +201,43 @@ Pandas的基础结构可以分为两种：**数据框和序列**。
   （1）如果返回值包括单行多列或多行单列时，返回值为Series对象；如果返回值包括多行多列时，返回值为DataFrame对象；如果返回值仅为一个单元格（单行单列）时，返回值为基本数据类型
   （2）df[]用于选取行和列数据，iloc和loc用于选取区域
 
+#### xlrd
+
+python操作excel主要用到xlrd和xlwt这两个库，即xlrd是读excel，xlwt是写excel的库。
+
+* 打开Excel文件读取数据：`book = xlrd.open_workbook(filename) # 返回一个xlrd.book.Book()对象`
+* 获取book中一个工作表：`table = book.sheet_by_index(sheet_index) #返回一个xlrd.sheet.Sheet()对象`
+
+* 行操作：
+
+  ```python
+  nrows = table.nrows  #获取该sheet中的有效行数
+  table.row(rowx)  #返回由该行中所有的单元格对象组成的列表
+  table.row_slice(rowx)  #返回由该列中所有的单元格对象组成的列表
+  table.row_types(rowx, start_colx=0, end_colx=None)    #返回由该行中所有单元格的数据类型组成的列表
+  table.row_values(rowx, start_colx=0, end_colx=None)   #返回由该行中所有单元格的数据组成的列表
+  table.row_len(rowx) #返回该列的有效单元格长度
+  ```
+
+* 列操作：
+
+  ```python
+  ncols = table.ncols   #获取列表的有效列数
+  table.col(colx, start_rowx=0, end_rowx=None)  #返回由该列中所有的单元格对象组成的列表
+  table.col_slice(colx, start_rowx=0, end_rowx=None)  #返回由该列中所有的单元格对象组成的列表
+  table.col_types(colx, start_rowx=0, end_rowx=None)    #返回由该列中所有单元格的数据类型组成的列表
+  table.col_values(colx, start_rowx=0, end_rowx=None)   #返回由该列中所有单元格的数据组成的列表
+  ```
+
+* 单元格操作：
+
+  ```
+  table.cell(rowx,colx)   #返回单元格对象
+  table.cell_type(rowx,colx)    #返回单元格中的数据类型
+  table.cell_value(rowx,colx)   #返回单元格中的数据
+  table.cell_xf_index(rowx, colx)   # 暂时还没有搞懂
+  ```
+
 
 
 ---
@@ -214,7 +250,7 @@ Pandas的基础结构可以分为两种：**数据框和序列**。
   from PIL import Image
   img = Image.open(path) # 打开文件，并以Image格式返回，返回值可以直接输入到transforms中
   img.convert(mode) # 转换类型
-  img_array = np.asarray(img) # 图片转为矩阵
+  img_array = np.asarray(img) # 图像转矩阵
   img = Image.fromarray(img_array) # 矩阵转为Image对象
   ```
 
@@ -225,9 +261,9 @@ Pandas的基础结构可以分为两种：**数据框和序列**。
   # 显示图片
   img_array = plt.imread(path) # 直接以矩阵形式返回
   # img = Image.open(path)
+  fig = plt.figure() # 创建一个figure对象
   ax1 = fig.add_subplot(211)
   img = plt.imshow(img_array, cmap=None) # 输入一个矩阵或PILImage类，返回一个AxesImage对象
-  fig = plt.figure() # 创建一个figure对象
   fig.suptitle("title")
   plt.axis() # 显示坐标轴
   plt.show() # 展示图片（jupyter不需要）
@@ -258,22 +294,16 @@ Pandas的基础结构可以分为两种：**数据框和序列**。
   
   ```
 
-  
-
-
 
 ---
 
 ## File operation
 
+* **判断并创建文件夹：**`if not os.path.exists(path): os.mkdir(newfile)`
 * **重命名文件：**`os.rename(src,dst)` src为源文件（原名），dst为目标文件（新名）
-
 * **删除文件：**`os.remove(path)`
-
 * **复制文件：**`shutil.copyfile(src,dst)`
-
 * **返回所有匹配的文件路径列表：**`glob.glob()` ”\*”, “?”, “[]”。”*”匹配0个或多个字符；”?”匹配单个字符；”[]”匹配指定范围内的字符
-
 * **创建/删除文件夹：**
 
 `os.mkdir(path)` # 只能创建一级目录
@@ -283,11 +313,21 @@ Pandas的基础结构可以分为两种：**数据框和序列**。
 
 * **获取路径内容：**
 
-`os.listdir(path)` # 返回指定路径下的文件和文件夹列表
-`os.scandir(path)` # 新版本用法，返回一个迭代器对象
-`os.getcwd()` # 获取当前目录
-`os.path.join(path1,path2)` # 获取拼接的目录
-`os.path.split(path)` # 将目录分割为目录和文件名以二元组返回Torchvision
+  `os.walk(path,topdown)` # 通过在目录树中游走输出在目录中的文件名(优于listdir)
+
+  ```python
+  for root, dirs, files in os.walk(".", topdown=False):
+  	for name in files:
+  		pass # 对所有文件夹和子文件夹下的文件进行遍历
+      for name in dirs:
+          pass # 对所有子文件夹进行遍历，注意也会包含子文件夹内的文件夹
+  ```
+
+  `os.listdir(path)` # 返回指定路径下的文件和文件夹列表
+  `os.scandir(path)` # 新版本用法，返回一个迭代器对象
+  `os.getcwd()` # 获取当前目录
+  `os.path.join(path1,path2)` # 获取拼接的目录
+  `os.path.split(path)` # 将目录分割为目录和文件名以二元组返回Torchvision
 
 1、在datasets模块中保存着各类数据集
 2、在models模块中保存搭建好的网络（可以不加载数据）

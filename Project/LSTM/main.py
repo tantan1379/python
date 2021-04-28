@@ -1,142 +1,105 @@
-import torch
-from torch import nn, optim
-from torchtext import data, datasets
-
-print('GPU:', torch.cuda.is_available())
-
-torch.manual_seed(123)
-
-TEXT = data.Field(tokenize='spacy')
-LABEL = data.LabelField(dtype=torch.float)
-train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
-
-print('len of train data:', len(train_data))
-print('len of test data:', len(test_data))
-
-print(train_data.examples[15].text)
-print(train_data.examples[15].label)
-
-# word2vec, glove
-TEXT.build_vocab(train_data, max_size=10000, vectors='glove.6B.100d')
-LABEL.build_vocab(train_data)
+import torch 
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
 
 
-batchsz = 30
-device = torch.device('cuda')
-train_iterator, test_iterator = data.BucketIterator.splits(
-    (train_data, test_data),
-    batch_size = batchsz,
-    device=device
-)
+# Device configuration
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# Hyper-parameters
+sequence_length = 28
+input_size = 28
+hidden_size = 128
+num_layers = 2
+num_classes = 10
+batch_size = 100
+num_epochs = 2
+learning_rate = 0.01
+
+# MNIST dataset
+train_dataset = torchvision.datasets.MNIST(root='../../data/',
+                                           train=True, 
+                                           transform=transforms.ToTensor(),
+                                           download=True)
+
+test_dataset = torchvision.datasets.MNIST(root='../../data/',
+                                          train=False, 
+                                          transform=transforms.ToTensor())
+
+# Data loader
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                           batch_size=batch_size, 
+                                           shuffle=True)
+
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+                                          batch_size=batch_size, 
+                                          shuffle=False)
+
+# Recurrent neural network (many-to-one)
 class RNN(nn.Module):
-    
-    def __init__(self, vocab_size, embedding_dim, hidden_dim):
-        """
-        """
+    def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(RNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
         
-        # [0-10001] => [100]
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        # [100] => [256]
-        self.rnn = nn.LSTM(embedding_dim, hidden_dim, num_layers=2, 
-                           bidirectional=True, dropout=0.5)
-        # [256*2] => [1]
-        self.fc = nn.Linear(hidden_dim*2, 1)
-        self.dropout = nn.Dropout(0.5)
-        
-        
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, num_classes)
+    
     def forward(self, x):
-        """
-        x: [seq_len, b] vs [b, 3, 28, 28]
-        """
-        # [seq, b, 1] => [seq, b, 100]
-        embedding = self.dropout(self.embedding(x))
+        # 初始化的隐藏元和记忆元,通常它们的维度是一样的
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device) #x.size(0)是batch_size
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
         
-        # output: [seq, b, hid_dim*2]
-        # hidden/h: [num_layers*2, b, hid_dim]
-        # cell/c: [num_layers*2, b, hid_di]
-        output, (hidden, cell) = self.rnn(embedding)
+        # Forward propagate LSTM
+        out, (ht,ct) = self.lstm(x, (h0, c0))  # out: tensor of shape (batch_size, seq_length, hidden_size)
         
-        # [num_layers*2, b, hid_dim] => 2 of [b, hid_dim] => [b, hid_dim*2]
-        hidden = torch.cat([hidden[-2], hidden[-1]], dim=1)
-        
-        # [b, hid_dim*2] => [b, 1]
-        hidden = self.dropout(hidden)
-        out = self.fc(hidden)
-        
+        # Decode the hidden state of the last time step
+        out = self.fc(out[:,-1,:])
         return out
 
-rnn = RNN(len(TEXT.vocab), 100, 256)
+model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
-pretrained_embedding = TEXT.vocab.vectors
-print('pretrained_embedding:', pretrained_embedding.shape)
-rnn.embedding.weight.data.copy_(pretrained_embedding)
-print('embedding layer inited.')
 
-optimizer = optim.Adam(rnn.parameters(), lr=1e-3)
-criteon = nn.BCEWithLogitsLoss().to(device)
-rnn.to(device)
+# Loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-import numpy as np
-
-def binary_acc(preds, y):
-    """
-    get accuracy
-    """
-    preds = torch.round(torch.sigmoid(preds))
-    correct = torch.eq(preds, y).float()
-    acc = correct.sum() / len(correct)
-    return acc
-
-def train(rnn, iterator, optimizer, criteon):
-    
-    avg_acc = []
-    rnn.train()
-    
-    for i, batch in enumerate(iterator):
+# Train the model
+total_step = len(train_loader)
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):
+        # print('before',images.shape)
+        images = images.reshape(-1, sequence_length, input_size).to(device)
+        labels = labels.to(device)
+        # print('after reshape',images.shape)
+        # Forward pass
+        outputs = model(images)
+        # print('output',outputs.size())
+        loss = criterion(outputs, labels)
         
-        # [seq, b] => [b, 1] => [b]
-        pred = rnn(batch.text).squeeze(1)
-        # 
-        loss = criteon(pred, batch.label)
-        acc = binary_acc(pred, batch.label).item()
-        avg_acc.append(acc)
-        
+        # Backward and optimize
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         
-        if i%10 == 0:
-            print(i, acc)
-        
-    avg_acc = np.array(avg_acc).mean()
-    print('avg acc:', avg_acc)
-    
-    
-def eval(rnn, iterator, criteon):
-    
-    avg_acc = []
-    
-    rnn.eval()
-    
-    with torch.no_grad():
-        for batch in iterator:
+        if (i+1) % 100 == 0:
+            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
+                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
 
-            # [b, 1] => [b]
-            pred = rnn(batch.text).squeeze(1)
+# Test the model
+with torch.no_grad():
+    correct = 0
+    total = 0
+    for images, labels in test_loader:
+        images = images.reshape(-1, sequence_length, input_size).to(device)
+        labels = labels.to(device)
+        outputs = model(images)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
 
-            #
-            loss = criteon(pred, batch.label)
+    print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total)) 
 
-            acc = binary_acc(pred, batch.label).item()
-            avg_acc.append(acc)
-        
-    avg_acc = np.array(avg_acc).mean()
-    
-    print('>>test:', avg_acc)
-
-for epoch in range(10):
-    
-    eval(rnn, test_iterator, criteon)
-    train(rnn, train_iterator, optimizer, criteon)
+# Save the model checkpoint
+torch.save(model.state_dict(), 'model.ckpt')

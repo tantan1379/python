@@ -43,6 +43,8 @@ def train(model, train_loader, optimizer, criterion, n_labels):
         optimizer.zero_grad()
 
         output = model(data)
+        # if idx==0:
+        #     print(output.shape)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
