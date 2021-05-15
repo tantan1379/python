@@ -1,0 +1,4 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/Volumes/Adam's Hard Drive/MIPAV实验室/Digital_Image_Processing/segmentation"
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Volumes/Adam's Hard Drive/MIPAV实验室/Digital_Image_Processing/segmentation/cmake-build-debug

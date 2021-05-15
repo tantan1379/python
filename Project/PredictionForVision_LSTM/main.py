@@ -11,6 +11,7 @@ from dataloader.dataset import TreatmentRequirement
 from config import config
 from torch.utils.data import DataLoader
 from model.ResNetLSTM import ExtractFeature, LSTM
+from sklearn.metrics import r2_score
 
 
 # def GetBatch(data, label, sampleNum, batchnum=4):
@@ -83,9 +84,10 @@ if __name__ == '__main__':
                     batch_data[i] = one_data
                 batch_data = batch_data.cuda()
                 pred = model2(batch_data)
-                # print(pred.shape)
-                # print(target.shape)
                 loss = torch.sqrt(criteria(pred, target))
+                # with torch.no_grad():
+                #     print(pred.cpu(), target.cpu())
+                    # r2_score = r2_score(pred.cpu(), target.cpu())
                 loss.backward()
                 optimizer.step()
                 train_loss.update(loss.item(), data.size(0))
@@ -95,7 +97,7 @@ if __name__ == '__main__':
                 model2.eval()
                 with torch.no_grad():
                     data = data.cuda()
-                    target = torch.from_numpy(np.array(target)).squeeze(1).long().cuda()
+                    target = torch.from_numpy(np.array(target)).long().cuda()
                 batch_data = torch.zeros(config.batch_size,config.seq_len,2048)
                 for i,one_data in enumerate(data):
                     one_data = model1(one_data)

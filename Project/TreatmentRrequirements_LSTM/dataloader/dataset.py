@@ -9,8 +9,7 @@ from torchvision import transforms
 from config import config
 import numpy as np
 import random
-from sklearn.metrics import r2_score,mean_squared_error
-
+import glob
 
 random.seed(config.seed)
 np.random.seed(config.seed)
@@ -35,11 +34,29 @@ class TreatmentRequirement(Dataset):
         imgs,labels = [],[]
         for pat in os.listdir(dataPath):
             patpath = dataPath + pat
-            frames = []
-            for i in range(1, config.seq_len+1):
-                imgname = '{}-V{}-OCT.jpg'.format(pat, i)
-                frames.append(patpath+os.sep+imgname)
-            imgs.append(frames)
+            frames_one_pat = []
+            # -------------------------------
+            # 6 channels data
+            # -------------------------------
+            # for one_v in os.listdir(patpath):
+            #     if not os.path.isdir(os.path.join(patpath,one_v)):
+            #         continue
+            #     vpath = patpath + os.sep + one_v
+            #     frames_one_v = []
+            #     for one_pic in os.listdir(vpath):
+            #         picpath = vpath+os.sep+one_pic
+            #         frames_one_v.append(picpath)
+            #     frames_one_pat.append(frames_one_v)
+            # -------------------------------
+            # 18 channels data
+            # -------------------------------
+            for one_v in os.listdir(patpath):
+                if not os.path.isdir(os.path.join(patpath,one_v)):
+                        continue
+                vpath = patpath + os.sep + one_v
+                for one_pic in os.listdir(vpath):
+                    frames_one_pat.append(os.path.join(patpath,one_v,one_pic))
+            imgs.append(frames_one_pat)
             labelPath = patpath + os.sep + 'label.txt'
             tx = open(labelPath)
             str1 = tx.read()
@@ -47,60 +64,131 @@ class TreatmentRequirement(Dataset):
             labels.append([int(str1)-1])
         imgs = np.array(imgs)
         labels = np.array(labels)
+        # print(labels)
         return imgs, labels
 
     def __getitem__(self,index):
         img, label = self.imgs[index], self.labels[index]
-        nimg = torch.zeros(self.seq_len,3,config.img_height,config.img_width)
-        trans = {
-            "train": transforms.Compose([
-                lambda x: Image.open(x).convert("L"),
-                transforms.Resize((int(config.img_height * 1.25),
-                                   int(config.img_width * 1.25))),
-                transforms.RandomRotation(15),
-                transforms.CenterCrop((config.img_height, config.img_width)),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-                    0.229, 0.224, 0.225])
-            ]),
-            "val": transforms.Compose([
-                lambda x: Image.open(x).convert("L"),
-                transforms.Resize((int(config.img_height * 1.25),
-                    int(config.img_width * 1.25))),
-                transforms.CenterCrop((config.img_height, config.img_width)),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-                                     0.229, 0.224, 0.225])
-            ])}
-
-        # trans = transforms.Compose([
-        #         lambda x: Image.open(x).convert("RGB"),
+        # trans = {
+        #     "train": transforms.Compose([
+        #         lambda x: Image.open(x),
+        #         # transforms.RandomRotation(15),
+        #         transforms.CenterCrop((config.center_crop_height, config.center_crop_width)),
         #         transforms.Resize((int(config.img_height),
         #             int(config.img_width))),
-        #         # transforms.CenterCrop((config.img_height, config.img_width)),
         #         transforms.ToTensor(),
-        #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-        #                              0.229, 0.224, 0.225])
-        # ])
+        #         transforms.Normalize(0.4630,0.2163)
+        #     ]),
+        #     "val": transforms.Compose([
+        #         lambda x: Image.open(x),
+        #         transforms.CenterCrop((config.center_crop_height, config.center_crop_width)),
+        #         transforms.Resize((int(config.img_height),
+        #             int(config.img_width))),
+        #         transforms.ToTensor(),
+        #         transforms.Normalize(0.4630,0.2163)
+        #     ])}
 
-        if self.mode=="train":
-            for f in range(self.seq_len):
-                single_img = img[f]
-                single_img = trans["train"](single_img)
-                nimg[f] = single_img
-        else:
-            for f in range(self.seq_len):
-                single_img = img[f]
-                single_img = trans["val"](single_img)
-                nimg[f] = single_img
+        # -------------------------------
+        # no transform
+        # -------------------------------
+        trans = transforms.Compose([
+                lambda x: Image.open(x),
+                transforms.Resize((int(config.img_height),
+                    int(config.img_width))),
+                # transforms.CenterCrop((config.img_height, config.img_width)),
+                transforms.ToTensor(),
+                transforms.Normalize(0.4630,0.2163)
+        ])
 
-        # for f in range(self.seq_len):
-        #         single_img = img[f]
-        #         single_img = trans(single_img)
-        #         nimg[f] = single_img
+        # -------------------------------
+        # 6 channels proprecess 
+        # -------------------------------
+        # if self.mode=="train":
+        #     all_v_img = torch.zeros(config.seq_len,config.input_channel,config.img_height,config.img_width)
 
+        #     for one_v in range(config.seq_len):
+        #         merged_img = torch.zeros(config.input_channel,config.img_height,config.img_width)
+        #         for one_pic in range(config.input_channel):
+        #             single_img = img[one_v,one_pic]
+        #             single_img = trans["train"](single_img)
+        #             merged_img[one_pic]=single_img
+        #         all_v_img[one_v] = merged_img
+        #
+        # else:
+        #     all_v_img = torch.zeros(config.seq_len,config.input_channel,config.img_height,config.img_width)
+        #     for one_v in range(config.seq_len):
+        #         merged_img = torch.zeros(config.input_channel,config.img_height,config.img_width)
+        #         for one_pic in range(config.input_channel):
+        #             single_img = img[one_v,one_pic]
+        #             single_img = trans["val"](single_img)
+        #             merged_img[one_pic]=single_img
+        #         all_v_img[one_v] = merged_img
+
+        # ------------------------------
+        # 18 channels preprocessed
+        # -------------------------------
+        # if self.mode=="train":
+        #     all_v_img = torch.zeros(config.seq_len,config.img_height,config.img_width)
+        #     for one_pic in range(config.seq_len):
+        #         single_img = img[one_pic]
+        #         single_img = trans["train"](single_img)
+        #         all_v_img[one_pic] = single_img
+        #     img = all_v_img
+        # else:
+        #     all_v_img = torch.zeros(config.seq_len,config.img_height,config.img_width)
+        #     for one_pic in range(config.seq_len):
+        #         single_img = img[one_pic]
+        #         single_img = trans["val"](single_img)
+        #         all_v_img[one_pic] = single_img
+        #     img = all_v_img
+
+        all_v_img = torch.zeros(config.seq_len,config.img_height,config.img_width)
+        for one_pic in range(config.seq_len):
+            single_img = img[one_pic]
+            single_img = trans(single_img)
+            all_v_img[one_pic] = single_img
+        img = all_v_img
         label = torch.Tensor(label)
-        return nimg, label
+        return img, label
 
     def __len__(self):
         return len(self.imgs)
+
+
+def main():
+    dataset = TreatmentRequirement(config.data_path,"train",0,3)
+    # imgs,_ = dataset.get_img_label(config.data_path)
+    # img = imgs[0]
+    # print(img.shape)
+    print(dataset[0][0].shape)
+    trans = {
+    "train": transforms.Compose([
+        lambda x: Image.open(x),
+        transforms.Resize((int(config.img_height * 1.25),
+                            int(config.img_width * 1.25))),
+        transforms.RandomRotation(15),
+        transforms.CenterCrop((config.img_height, config.img_width)),
+        transforms.ToTensor(),
+        transforms.Normalize(0.4630,0.2163)
+    ]),
+    "val": transforms.Compose([
+        lambda x: Image.open(x),
+        transforms.Resize((int(config.img_height * 1.25),
+            int(config.img_width * 1.25))),
+        transforms.CenterCrop((config.img_height, config.img_width)),
+        transforms.ToTensor(),
+        transforms.Normalize(0.4630,0.2163)
+    ])}
+    # all_v_img = img.unsqueeze(0)
+    # # print(all_v_img.shape)
+    # for one_v in range(config.seq_len):
+    #     merged_img = torch.zeros(config.input_channel,config.img_height,config.img_width)
+    #     for one_pic in range(config.input_channel):
+    #         single_img = img[one_v,one_pic]
+    #         single_img = trans["train"](single_img)
+    #         merged_img[one_pic]=single_img
+    #     all_v_img[one_v] = merged_img
+    # print(all_v_img)
+
+if __name__ == "__main__":
+    main()

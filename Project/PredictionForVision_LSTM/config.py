@@ -1,6 +1,6 @@
 class DefaultConfigs(object):
     # 1.string parameters
-    data_path = "F:\\Dataset\\AMD_TimeSeries_CL\\1_to_16_joint_resize_label_requirement\\"
+    data_path = "F:\\Dataset\\AMD_TimeSeries_CL\\1_to_16_single\\"
     gpus = '0'
     model_name = 'ResNetLSTM'
     # 2.numeric parameters

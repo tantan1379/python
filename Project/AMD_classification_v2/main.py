@@ -151,8 +151,8 @@ def main():
             img = img.cuda()
             target = torch.from_numpy(np.array(target)).long().cuda()
             output = model(img)
-            print(target.shape)
-            print(output.shape)
+            # print(target)
+            print(output)
             loss = criterion(output, target)
             precision1_train = accuracy(output, target)
             train_losses.update(loss.item(), img.size(0))  # img.size(0) = batch

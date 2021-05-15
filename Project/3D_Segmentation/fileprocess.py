@@ -9,8 +9,8 @@ if not os.path.exists(root+'data'):
     os.mkdir(root+"data")
 if not os.path.exists(root+'label'):
     os.mkdir(root+"label")
-raw_path = "D:\\BaiduCloud\\3DT1"
-des_path = "F:\\Dataset\\gliomas\\data\\"
+# raw_path = "D:\\BaiduCloud\\3DT1"
+# des_path = "F:\\Dataset\\gliomas\\data\\"
 label_raw_path = "D:\\BaiduCloud\\roi_204\\"
 label_des_path = "F:\Dataset\\gliomas\\label\\"
 

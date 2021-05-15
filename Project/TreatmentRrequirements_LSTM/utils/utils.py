@@ -36,21 +36,31 @@ def save_checkpoint(state, is_best, fold):  # state是一个记录训练结果�
         shutil.copyfile(filename, message)
 
 
-def accuracy(output, target,topk=(1,)):
-    """Computes the accuracy over the k top predictions for the specified values of k"""
+# def accuracy(output, target,topk=(1,)):
+    # """Computes the accuracy over the k top predictions for the specified values of k"""
+    # with torch.no_grad():
+    #     maxk = max(topk)
+    #     batch_size = target.size(0)
+    #     # torch.topk(input, k, dim=None, largest=True, sorted=True, out=None) 返回输入张量指定dim的k个最大值
+    #     _, pred = output.topk(maxk, 1, True, True)
+    #     pred = pred.t()
+    #     correct = pred.eq(target)
+    #     res = []
+    #     for k in topk:
+    #         correct_k = correct[:k].contiguous(
+    #         ).view(-1).float().sum(0, keepdim=True)
+    #         res.append(correct_k.mul_(100.0 / batch_size))
+    #     return res
+
+def accuracy(pred,target):
     with torch.no_grad():
-        maxk = max(topk)
         batch_size = target.size(0)
-        # torch.topk(input, k, dim=None, largest=True, sorted=True, out=None) 返回输入张量指定dim的k个最大值
-        _, pred = output.topk(maxk, 1, True, True)
-        pred = pred.t()
-        correct = pred.eq(target)
-        res = []
-        for k in topk:
-            correct_k = correct[:k].contiguous(
-            ).view(-1).float().sum(0, keepdim=True)
-            res.append(correct_k.mul_(100.0 / batch_size))
-        return res
+        pred_index = torch.argmax(pred,dim=1)
+        # print("pred",pred_index)
+        # print("target",target)
+        correct = (pred_index==target).sum().float()
+        acc = correct/batch_size
+    return acc
 
 
 def get_learning_rate(optimizer):

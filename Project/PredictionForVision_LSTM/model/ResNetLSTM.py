@@ -12,12 +12,13 @@ import numpy as np
 class ExtractFeature(nn.Module):
     def __init__(self):
         super(ExtractFeature, self).__init__()
+        self.conv1 = nn.Conv2d(16,64,7,2,3,bias=False)
         self.resnet = tv.models.resnet50(pretrained=True)
         self.final_pool = nn.AdaptiveAvgPool2d(1)
         # self.final_pool = torch.nn.MaxPool2d(3, 2)
 
     def forward(self,x):
-        x = self.resnet.conv1(x)
+        x = self.conv1(x)
         x = self.resnet.bn1(x)
         x = self.resnet.relu(x)
         x = self.resnet.maxpool(x)
@@ -28,7 +29,6 @@ class ExtractFeature(nn.Module):
         x = self.final_pool(x).squeeze()
         # x = x.flatten(start_dim=1)
         return x
-
 
 class LSTM(nn.Module):
     def __init__(self, lstm_hidden_size=2000):

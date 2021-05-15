@@ -40,7 +40,7 @@ class ProgressBar(object):
         }
         message = "\033[1;32;40m%(mode)s Epoch:  %(epoch)d/%(epochs)d %(bar)s\033[0m  [Current: Loss %(current_loss)f Top1: %(current_top1)f lr: %(current_lr).2e ]  %(current)d/%(total)d \033[1;32;40m[ %(percent)3d%% ]\033[0m" % args
         self.write_message = "%(mode)s Epoch:  %(epoch)d/%(epochs)d [Current: Loss %(current_loss)f Top1: %(current_top1)f lr: %(current_lr).2e ]" % args
-        print("\r" + message, file=self.output, end="")
+        # print("\r" + message, file=self.output, end="")
 
     def done(self):
         self.current = self.total

@@ -34,26 +34,26 @@ from PIL import Image
 
 # ----------------------------------------------------------------
 #TODO 尝试dataframe
-root = "C:\\Users\\TRT\\Desktop\\testset\\"
-images,labels,all_files = [],[],[]
-title = ['images','labels']
-for file in os.listdir(root):
-    images+=glob.glob(os.path.join(root,file,"*.jpg"))
-for image in images:
-    labels.append(int(image.split(os.sep)[-2]))
+# root = "C:\\Users\\TRT\\Desktop\\testset\\"
+# images,labels,all_files = [],[],[]
+# title = ['images','labels']
+# for file in os.listdir(root):
+#     images+=glob.glob(os.path.join(root,file,"*.jpg"))
+# for image in images:
+#     labels.append(int(image.split(os.sep)[-2]))
 
-img_label = np.concatenate((np.array(images).reshape(-1,1),np.array(labels).reshape(-1,1)),axis=1)
-# print(img_label)
-index = [i for i in range(1,len(labels)+1)]
-all_files= pd.DataFrame({"images":images,"labels":labels},index=index)
-# print(all_files)
-# print(all_files[all_files['labels']>=2]) # 布尔索引：选取labels>1的所有信息
-# print(all_files[lambda all_files:all_files.columns[0]])
-# all_files2= pd.DataFrame(img_label,columns=title,index=index)
-images=[]
-for _,row in all_files.iterrows():
-    images.append((row["images"],row["labels"]))
-print(images[:5])
+# img_label = np.concatenate((np.array(images).reshape(-1,1),np.array(labels).reshape(-1,1)),axis=1)
+# # print(img_label)
+# index = [i for i in range(1,len(labels)+1)]
+# all_files= pd.DataFrame({"images":images,"labels":labels},index=index)
+# # print(all_files)
+# # print(all_files[all_files['labels']>=2]) # 布尔索引：选取labels>1的所有信息
+# # print(all_files[lambda all_files:all_files.columns[0]])
+# # all_files2= pd.DataFrame(img_label,columns=title,index=index)
+# images=[]
+# for _,row in all_files.iterrows():
+#     images.append((row["images"],row["labels"]))
+# print(images[:5])
 
 # ----------------------------------------------------------------
 #TODO 查看dataloader原理
@@ -115,3 +115,26 @@ print(images[:5])
 # b = torch.tensor([2,2,3,4,5,6])
 # # b = b.view(1,-1)
 # print(torch.topk(a,3,dim=0))
+
+# ----------------------------------------------------------------
+#TODO densenet
+import torch.nn as nn 
+import torchvision as tv
+class ExtractFeature_(nn.Module):
+    def __init__(self):
+        super(ExtractFeature_, self).__init__()
+        self.densenet = tv.models.densenet121(pretrained=True)
+        self.final_pool = nn.AdaptiveAvgPool2d(1)
+        # self.final_pool = torch.nn.MaxPool2d(3, 2)
+
+    def forward(self,x):
+        x = self.densenet.conv0(x)
+        x = self.densenet.norm0(x)
+        x = self.densenet.relu0(x)  
+        x = self.final_pool(x).squeeze()
+        # x = x.flatten(start_dim=1)
+        return x
+
+x = torch.Tensor(3,224,224)
+model = ExtractFeature_()
+model(x)
