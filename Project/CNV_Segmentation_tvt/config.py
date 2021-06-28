@@ -24,7 +24,7 @@ class DefaultConfig(object):
     weight_decay = 1e-4             # L2正则化系数
     # 训练相关
     net_work = 'unet'          # 可选网络 * unet/cpfnet/resunetplusplus/resunet1
-    mode = 'test'                   # 训练模式 * train/test/train_test
+    mode = 'train_test'                   # 训练模式 * train/test/train_test
     num_workers = 0                 # dataloader设置
     num_classes = 1                 # 分割类别数 类别数+加背景 *
     cuda = '0'                      # GPU id选择 *

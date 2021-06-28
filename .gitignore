@@ -11,12 +11,11 @@ __pycache__/
 *.nii
 
 Clone/
-
+Preprocess/
 
 Debug/
 Release/
 venv/
-data/
 
 
 *.bmp

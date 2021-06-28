@@ -61,12 +61,16 @@ class CNV(data.Dataset):
             segmap = ia.SegmentationMapsOnImage(label, shape=label.shape) # 将分割结果转换为SegmentationMapOnImage类型，方便后面可视化
             img = seq_det.augment_image(img) # 对图像进行数据增强
             label = seq_det.augment_segmentation_maps([segmap])[0].get_arr().astype(np.uint8) # 将数据增强应用在分割标签上，并且转换成np类型
+            label = np.reshape(label, (1,)+label.shape)
+            label = torch.from_numpy(label.copy()).float()
+            labels = label
+
         elif self.mode=='val':
             label = np.reshape(label, (1,)+label.shape)
             label = torch.from_numpy(label.copy()).float()
             labels = label
 
-        else:
+        elif self.mode=='test':
             label = np.reshape(label, (1,)+label.shape)
             label = torch.from_numpy(label.copy()).float()
             labels = [label,labels]

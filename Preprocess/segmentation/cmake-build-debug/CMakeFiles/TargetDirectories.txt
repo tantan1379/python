@@ -1,3 +1,0 @@
-/Volumes/Adam's Hard Drive/MIPAV实验室/Digital_Image_Processing/segmentation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Volumes/Adam's Hard Drive/MIPAV实验室/Digital_Image_Processing/segmentation/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Volumes/Adam's Hard Drive/MIPAV实验室/Digital_Image_Processing/segmentation/cmake-build-debug/CMakeFiles/segmentation.dir
