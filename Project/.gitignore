@@ -1,0 +1,12 @@
+*/checkpoints/
+./3D_Segmentation/fixed_data
+./cnv_segmentation/result/.
+./DenseNet_Cifar10/data/.
+./CNV_Segmentation_tvt/reference/
+*.ckpt
+*.h5
+result/
+results/
+logs/
+checkpoint/
+checkpoints/
