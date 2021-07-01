@@ -88,7 +88,7 @@ class Test_ProgressBar(object):
             "specificity": self.val[4]
         }
         message = "\033[1;32;40m%(mode)s  %(bar)s\033[0m  [ Dice:%(dice)f Precision:%(precision)f Jaccard:%(jaccard)f Sensitivity:%(sensitivity)f Specificity:%(specificity)f ]  %(current)d/%(total)d \033[1;32;40m[%(percent)3d%%]\033[0m" % args
-        self.write_message = "Dice:%(dice)f Precision:%(precision)f Jaccard:%(jaccard)f Sensitivity:%(sensitivity)f Specificity:%(specificity)f" % args
+        self.write_message = "Metric: Dice Precision jaccard Sensitivity Specificity\n%(dice)f\t%(precision)f\t%(jaccard)f\t%(sensitivity)f\t%(specificity)f" % args
         print("\r" + message, file=self.output, end="")
 
     def done(self):

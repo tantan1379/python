@@ -8,7 +8,7 @@ import math
 
 class UNet_1(nn.Module):
 
-    def __init__(self, in_channels=1,n_classes=4,feature_scale=4, is_deconv=True, is_batchnorm=True):
+    def __init__(self, in_channels=1,n_classes=3,feature_scale=2, is_deconv=True, is_batchnorm=True):
         super(UNet_1, self).__init__()
         self.is_deconv = is_deconv
         self.in_channels = in_channels
@@ -86,9 +86,9 @@ class SELayer(nn.Module):
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-            nn.Linear(channel, channel // reduction, bias=False),
+            nn.Linear(channel, channel // reduction, bias=False), # 通道缩减
             nn.ReLU(inplace=True),
-            nn.Linear(channel // reduction, channel, bias=False),
+            nn.Linear(channel // reduction, channel, bias=False), # 通道扩增
             nn.Sigmoid()
         )
 

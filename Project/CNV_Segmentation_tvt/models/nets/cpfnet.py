@@ -53,12 +53,12 @@ class CPFNet(nn.Module):
                              is_aux=False, norm_layer=norm_layer)
        
         self.relu = nn.ReLU()
-
+        self.conv1 = nn.Conv2d(1,64,7,2,3)
         
     
     def forward(self, x):
-
-        x = self.backbone.conv1(x)
+        x = self.conv1(x)
+        # x = self.backbone.conv1(x)
         x = self.backbone.bn1(x)
         c1 = self.backbone.relu(x)#1/2  64
         

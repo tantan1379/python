@@ -199,7 +199,7 @@ def train(args, model, optimizer, criterion, dataloader_train, dataloader_val, w
 
         is_best = (Dice_srf + Dice_cnv) / 2 > best_pred
         if is_best:
-            best_pred = max(best_pred, (Dice_srf + Dice_cnv) / 2)
+            best_pred = Dice_srf + Dice_cnv) / 2
             best_acc = (Acc_srf + Acc_cnv) / 2
             best_jac = (jaccard_srf + jaccard_cnv) / 2
             best_sen = (Sensitivity_srf + Sensitivity_cnv) / 2

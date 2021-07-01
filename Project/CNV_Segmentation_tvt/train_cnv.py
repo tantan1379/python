@@ -89,6 +89,7 @@ def train(args, model, optimizer, criterion, dataloader_train, dataloader_val, w
         model.train()
 
         for i, (data, label) in enumerate(dataloader_train):
+            # print(i)
             if i==end_index:
                 break
             train_progressor.current = i*args.batch_size
@@ -126,11 +127,11 @@ def train(args, model, optimizer, criterion, dataloader_train, dataloader_val, w
 
         is_best = Dice > best_pred
         if is_best:
-            best_pred = max(best_pred, Dice)
-            best_jac = max(best_jac, jaccard)
-            best_acc = max(best_acc, Acc)
-            best_sen = max(best_sen, Sensitivity)
-            best_spe = max(best_spe, Specificity)
+            best_pred = Dice
+            best_jac = jaccard
+            best_acc = Acc
+            best_sen = Sensitivity
+            best_spe = Specificity
             best_epoch = epoch + 1
         checkpoint_dir = os.path.join(args.save_model_path)
         if not os.path.exists(checkpoint_dir):
@@ -142,7 +143,7 @@ def train(args, model, optimizer, criterion, dataloader_train, dataloader_val, w
             'best_dice': best_pred
         }, best_pred, epoch, is_best, checkpoint_dir, filename=checkpoint_latest_name) # 保存最好的
     # 记录该折分割效果最好一次epoch的所有参数
-    best_indicator_message = "best pred in Epoch:{}\nDice={:.4f} Accuracy={:.4f} jaccard={:.4f} Sensitivity={:.4f} Specificity={:.4f}".format(
+    best_indicator_message = "best pred in Epoch:{}\nVal Result:\nMetric: Dice Precision jaccard Sensitivity Specificity\n{.4f}\t{.4f}\t{.4f}\t{.4f}\t{.4f}".format(
         best_epoch, best_pred, best_acc, best_jac, best_sen, best_spe)
     end_time = datetime.now().strftime('%b%d %H:%M:%S')
     with open("./logs/%s_test_indicator.txt" % (args.save_model_path.split('/')[-1]), mode='a') as f:
@@ -152,11 +153,11 @@ def train(args, model, optimizer, criterion, dataloader_train, dataloader_val, w
 
 def eval(args, model, dataloader):
     print('\nStart Test!')
-    num_checkpoint = len(os.listdir(os.path.join("./checkpoints",args.net_work)))
-    for iter,c in enumerate(os.listdir(os.path.join("./checkpoints",args.net_work))):
-        if(iter==num_checkpoint-1):
-            break
-        pretrained_model_path = os.path.join("./checkpoints",args.net_work,c) # 最后一个模型(最好的)
+    # num_checkpoint = len(os.listdir(os.path.join("./checkpoints",args.net_work)))
+    for c in os.listdir(os.path.join(args.save_model_path)):
+        # if(iter==num_checkpoint-1):
+        #     break
+        pretrained_model_path = os.path.join(args.save_model_path,c) # 最后一个模型(最好的)
     print("Load best model "+'\"'+os.path.abspath(pretrained_model_path)+'\"')
     checkpoint = torch.load(pretrained_model_path)
     model.load_state_dict(checkpoint['state_dict'])
@@ -181,9 +182,9 @@ def eval(args, model, dataloader):
             Dice, Acc, jaccard, Sensitivity, Specificity = u.eval_single_seg(predict, label)
             predict = torch.round(torch.sigmoid(predict)).byte()
             predict_seg = predict.data.cpu().numpy().squeeze()*255
-            img = Image.fromarray(predict_seg,mode='L')
-            label_name = label_path[0].split(os.sep)[-1].split('.')[0]+'.png'
-            img.save(args.result_path+label_name)
+            # img = Image.fromarray(predict_seg,mode='L')
+            # label_name = label_path[0].split(os.sep)[-1].split('.')[0]+'.png'
+            # img.save(args.result_path+label_name)
             total_Dice += Dice
             total_Acc += Acc
             total_jaccard += jaccard
@@ -205,19 +206,19 @@ def main(mode='train', args=None, writer=None):
     dataset_train = CNV(dataset_path, scale=(
         args.crop_height, args.crop_width), mode='train')
     dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size,
-                                  shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
+                                  shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=False)
     dataset_val = CNV(dataset_path, scale=(
         args.crop_height, args.crop_width), mode='val')
     dataloader_val = DataLoader(dataset_val, batch_size=args.batch_size, 
-                                  shuffle=True,num_workers=args.num_workers, pin_memory=True, drop_last=True)
+                                  shuffle=True,num_workers=args.num_workers, pin_memory=True, drop_last=False)
     dataset_test = CNV(dataset_path, scale=(
         args.crop_height, args.crop_width), mode='test')
     dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, 
-                                  shuffle=False,num_workers=args.num_workers, pin_memory=True, drop_last=True)
+                                  shuffle=False,num_workers=args.num_workers, pin_memory=True, drop_last=False)
     # build model
     os.environ['CUDA_VISIBLE_DEVICES'] = args.cuda
     # load model
-    model = net_builder(args.net_work,args.pretrained,n_classes=args.num_classes).cuda()
+    model = net_builder(args.net_work,args.pretrained,n_class=args.num_classes).cuda()
     cudnn.benchmark = True
 
 

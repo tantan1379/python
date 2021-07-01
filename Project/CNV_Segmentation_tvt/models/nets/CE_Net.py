@@ -174,7 +174,8 @@ class CE_Net(nn.Module):
 
         filters = [64, 128, 256, 512]
         resnet = models.resnet34(pretrained=True)
-        self.firstconv = resnet.conv1
+        self.firstconv = nn.Conv2d(1,64,7,2,1)
+        # self.firstconv = resnet.conv1
         self.firstbn = resnet.bn1
         self.firstrelu = resnet.relu
         self.firstmaxpool = resnet.maxpool
